@@ -1,0 +1,14 @@
+node_modules/
+dist/
+outputs/
+projects/
+.env
+.env.local
+.DS_Store
+*.log
+*.swp
+.omx/
+.vclaw/
+.omc/
+.playwright-mcp/
+vclaw-review-ui-*.png
