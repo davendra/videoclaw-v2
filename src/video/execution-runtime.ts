@@ -18,6 +18,8 @@ import type {
 
 function adapterEnvVarForRoute(routeId: ProviderRouteId): string {
   switch (routeId) {
+    case 'veo-direct':
+      return 'VCLAW_VEO_DIRECT_ADAPTER';
     case 'veo-useapi':
       return 'VCLAW_VEO_USEAPI_ADAPTER';
     case 'seedance-direct':

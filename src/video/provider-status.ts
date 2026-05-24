@@ -19,6 +19,7 @@ interface BuildProviderStatusReportOptions {
 }
 
 const ROUTE_REQUIRED_ENV_VARS: Record<ProviderRouteId, string[]> = {
+  'veo-direct': [],
   'veo-useapi': ['USEAPI_API_TOKEN', 'USEAPI_ACCOUNT_EMAIL'],
   'seedance-direct': ['SUTUI_API_KEY'],
   'runway-useapi': ['USEAPI_API_TOKEN', 'USEAPI_ACCOUNT_EMAIL'],
@@ -26,6 +27,7 @@ const ROUTE_REQUIRED_ENV_VARS: Record<ProviderRouteId, string[]> = {
 };
 
 const ROUTE_REQUIRED_DEPENDENCIES: Record<ProviderRouteId, ExecutableName[]> = {
+  'veo-direct': ['bun', 'ffmpeg'],
   'veo-useapi': ['python3', 'bun', 'ffmpeg'],
   'seedance-direct': ['python3', 'ffmpeg'],
   'runway-useapi': ['python3', 'bun', 'ffmpeg'],
@@ -33,6 +35,7 @@ const ROUTE_REQUIRED_DEPENDENCIES: Record<ProviderRouteId, ExecutableName[]> = {
 };
 
 const ROUTE_MATURITY: Record<ProviderRouteId, 'production' | 'scaffold'> = {
+  'veo-direct': 'production',
   'veo-useapi': 'production',
   'seedance-direct': 'production',
   'runway-useapi': 'scaffold',
@@ -40,6 +43,7 @@ const ROUTE_MATURITY: Record<ProviderRouteId, 'production' | 'scaffold'> = {
 };
 
 const ROUTE_ADAPTER_ENV_VAR: Record<ProviderRouteId, string> = {
+  'veo-direct': 'VCLAW_VEO_DIRECT_ADAPTER',
   'veo-useapi': 'VCLAW_VEO_USEAPI_ADAPTER',
   'seedance-direct': 'VCLAW_SEEDANCE_DIRECT_ADAPTER',
   'runway-useapi': 'VCLAW_RUNWAY_USEAPI_ADAPTER',
@@ -163,7 +167,9 @@ export function buildProviderStatusReport(
       availability,
       maturity: ROUTE_MATURITY[route.id],
       summary: route.summary,
-      supportedOperations: route.supportedOperations,
+      supportedOperations: Array.from(
+        new Set(route.operationSupport.map((support) => support.operation)),
+      ),
       requiredEnvVars,
       availableEnvVars,
       missingEnvVars,
