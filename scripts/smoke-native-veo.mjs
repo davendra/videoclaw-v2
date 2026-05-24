@@ -20,11 +20,11 @@ function run(args, env = process.env) {
 }
 
 try {
-  const veoCliRoot = join(root, 'veo-cli');
+  const veoCliRoot = join(root, 'vclaw-cli');
   const outputDir = join(veoCliRoot, 'output-videos');
   await mkdir(outputDir, { recursive: true });
   await writeFile(join(veoCliRoot, 'cookie.json'), '{"session":"ok"}\n');
-  await writeFile(join(veoCliRoot, 'google.ts'), 'console.log("stub");\n');
+  await writeFile(join(veoCliRoot, 'flow.ts'), 'console.log("stub");\n');
 
   const bunStub = join(root, 'bun-stub.sh');
   const commandCapturePath = join(root, 'veo-command.txt');

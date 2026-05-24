@@ -18,8 +18,8 @@ describe('verify env', () => {
       ].join('\n'));
       await mkdir(join(root, 'dist', 'cli'), { recursive: true });
       await writeFile(join(root, 'dist', 'cli', 'vclaw.js'), '#!/usr/bin/env node\n');
-      await mkdir(join(root, 'veo-cli'), { recursive: true });
-      await writeFile(join(root, 'veo-cli', 'cookie.json'), '{"session":"ok"}');
+      await mkdir(join(root, 'vclaw-cli'), { recursive: true });
+      await writeFile(join(root, 'vclaw-cli', 'cookie.json'), '{"session":"ok"}');
 
       const report = buildVideoEnvironmentReport({
         workspaceRoot: root,

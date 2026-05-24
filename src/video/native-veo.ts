@@ -33,7 +33,7 @@ async function loadWorkspaceEnv(workspaceRoot: string, env: NodeJS.ProcessEnv): 
 }
 
 function veoCliRoot(workspaceRoot: string, env: NodeJS.ProcessEnv): string {
-  return env.VCLAW_VEO_CLI_ROOT || join(workspaceRoot, 'veo-cli');
+  return env.VCLAW_VEO_CLI_ROOT || join(workspaceRoot, 'vclaw-cli');
 }
 
 function veoOutputDir(workspaceRoot: string, env: NodeJS.ProcessEnv): string {
@@ -45,11 +45,11 @@ function veoBunBin(env: NodeJS.ProcessEnv): string {
 }
 
 function ensureVeoCliEntry(cliRoot: string): void {
-  const entryPath = join(cliRoot, 'google.ts');
+  const entryPath = join(cliRoot, 'flow.ts');
   if (existsSync(entryPath)) return;
   throw new Error(
-    `veo-useapi native transport could not find google.ts at ${entryPath}. ` +
-    'Set VCLAW_VEO_CLI_ROOT to your Veo CLI directory (for example, /path/to/videoclaw/veo-cli).',
+    `veo-useapi native transport could not find flow.ts at ${entryPath}. ` +
+    'Set VCLAW_VEO_CLI_ROOT to your vclaw-cli directory (for example, /path/to/videoclaw-v2/vclaw-cli).',
   );
 }
 
@@ -218,7 +218,7 @@ export async function submitVeoUseApiNative(
     const commandResult = await runVeoCommand(
       [
         'run',
-        'google.ts',
+        'flow.ts',
         '-p',
         buildPrompt(task),
         '-n',

@@ -55,11 +55,11 @@ describe('veo-useapi native transport', () => {
       process.env.USEAPI_API_TOKEN = 'token';
       process.env.USEAPI_ACCOUNT_EMAIL = 'email@example.com';
       await seedReadyProject(root);
-      const veoCliRoot = join(root, 'veo-cli');
+      const veoCliRoot = join(root, 'vclaw-cli');
       const outputDir = join(veoCliRoot, 'output-videos');
       const commandCapturePath = join(root, 'veo-useapi-command.txt');
       await mkdir(outputDir, { recursive: true });
-      await writeFile(join(veoCliRoot, 'google.ts'), 'console.log("stub");\n');
+      await writeFile(join(veoCliRoot, 'flow.ts'), 'console.log("stub");\n');
 
       const bunStub = join(root, 'bun-useapi-stub.sh');
       await writeFile(bunStub, [
@@ -116,10 +116,10 @@ describe('veo-useapi native transport', () => {
       process.env.USEAPI_API_TOKEN = 'token';
       process.env.USEAPI_ACCOUNT_EMAIL = 'email@example.com';
       await seedReadyProject(root);
-      const veoCliRoot = join(root, 'veo-cli');
+      const veoCliRoot = join(root, 'vclaw-cli');
       const outputDir = join(veoCliRoot, 'output-videos');
       await mkdir(outputDir, { recursive: true });
-      await writeFile(join(veoCliRoot, 'google.ts'), 'console.log("stub");\n');
+      await writeFile(join(veoCliRoot, 'flow.ts'), 'console.log("stub");\n');
 
       const bunStub = join(root, 'bun-useapi-no-output-stub.sh');
       await writeFile(bunStub, [
@@ -154,7 +154,7 @@ describe('veo-useapi native transport', () => {
     }
   });
 
-  it('fails with actionable guidance when google.ts is missing in the resolved Veo CLI root', async () => {
+  it('fails with actionable guidance when flow.ts is missing in the resolved Veo CLI root', async () => {
     const root = await mkdtemp(join(tmpdir(), 'vclaw-native-veo-missing-google-ts-'));
     const previousUseApiToken = process.env.USEAPI_API_TOKEN;
     const previousUseApiEmail = process.env.USEAPI_ACCOUNT_EMAIL;
@@ -172,9 +172,9 @@ describe('veo-useapi native transport', () => {
       });
       assert.equal(result.report.status, 'blocked');
       const blockerText = (result.report.blockers ?? []).join('\n');
-      assert.match(blockerText, /could not find google\.ts/);
+      assert.match(blockerText, /could not find flow\.ts/);
       assert.match(blockerText, /Set VCLAW_VEO_CLI_ROOT/);
-      assert.match(blockerText, /videoclaw\/veo-cli/);
+      assert.match(blockerText, /videoclaw-v2\/vclaw-cli/);
     } finally {
       if (previousUseApiToken === undefined) delete process.env.USEAPI_API_TOKEN;
       else process.env.USEAPI_API_TOKEN = previousUseApiToken;
@@ -192,10 +192,10 @@ describe('veo-useapi native transport', () => {
       process.env.USEAPI_API_TOKEN = 'token';
       process.env.USEAPI_ACCOUNT_EMAIL = 'email@example.com';
       await seedReadyProject(root);
-      const veoCliRoot = join(root, 'veo-cli');
+      const veoCliRoot = join(root, 'vclaw-cli');
       const outputDir = join(veoCliRoot, 'output-videos');
       await mkdir(outputDir, { recursive: true });
-      await writeFile(join(veoCliRoot, 'google.ts'), 'console.log("stub");\n');
+      await writeFile(join(veoCliRoot, 'flow.ts'), 'console.log("stub");\n');
 
       const bunStub = join(root, 'bun-useapi-refresh-fail-stub.sh');
       await writeFile(bunStub, [
@@ -237,10 +237,10 @@ describe('veo-useapi native transport', () => {
       process.env.USEAPI_API_TOKEN = 'token';
       process.env.USEAPI_ACCOUNT_EMAIL = 'email@example.com';
       await seedReadyProject(root);
-      const veoCliRoot = join(root, 'veo-cli');
+      const veoCliRoot = join(root, 'vclaw-cli');
       const outputDir = join(veoCliRoot, 'output-videos');
       await mkdir(outputDir, { recursive: true });
-      await writeFile(join(veoCliRoot, 'google.ts'), 'console.log("stub");\n');
+      await writeFile(join(veoCliRoot, 'flow.ts'), 'console.log("stub");\n');
 
       const bunStub = join(root, 'bun-useapi-refresh-fail-no-output-stub.sh');
       await writeFile(bunStub, [
@@ -283,10 +283,10 @@ describe('veo-useapi native transport', () => {
       process.env.USEAPI_API_TOKEN = 'token';
       process.env.USEAPI_ACCOUNT_EMAIL = 'email@example.com';
       await seedReadyProject(root);
-      const veoCliRoot = join(root, 'veo-cli');
+      const veoCliRoot = join(root, 'vclaw-cli');
       const outputDir = join(veoCliRoot, 'output-videos');
       await mkdir(outputDir, { recursive: true });
-      await writeFile(join(veoCliRoot, 'google.ts'), 'console.log("stub");\n');
+      await writeFile(join(veoCliRoot, 'flow.ts'), 'console.log("stub");\n');
 
       const bunStub = join(root, 'bun-useapi-refresh-timeout-stub.sh');
       await writeFile(bunStub, [
@@ -332,10 +332,10 @@ describe('veo-useapi native transport', () => {
       process.env.USEAPI_API_TOKEN = 'token';
       process.env.USEAPI_ACCOUNT_EMAIL = 'email@example.com';
       await seedReadyProject(root);
-      const veoCliRoot = join(root, 'veo-cli');
+      const veoCliRoot = join(root, 'vclaw-cli');
       const outputDir = join(veoCliRoot, 'output-videos');
       await mkdir(outputDir, { recursive: true });
-      await writeFile(join(veoCliRoot, 'google.ts'), 'console.log("stub");\n');
+      await writeFile(join(veoCliRoot, 'flow.ts'), 'console.log("stub");\n');
 
       const bunStub = join(root, 'bun-useapi-timeout-no-output-stub.sh');
       await writeFile(bunStub, [
