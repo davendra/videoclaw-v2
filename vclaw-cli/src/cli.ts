@@ -13,8 +13,6 @@ import {
   resetFailedJobs,
   cancelBatch,
   getMostRecentIncompleteBatch,
-  isUsingConvex,
-  syncToConvex,
   getUseApiStats,
   type Batch,
   type Job,
@@ -31,7 +29,6 @@ export type Command =
   | "history"
   | "cancel"
   | "help"
-  | "sync"
   // useapi.net subcommands
   | "useapi:accounts"
   | "useapi:captcha"
@@ -146,9 +143,6 @@ export function parseCommand(args: string[]): CLIOptions {
         break;
       case "help":
         options.command = "help";
-        break;
-      case "sync":
-        options.command = "sync";
         break;
       // useapi.net subcommands
       case "useapi:accounts":
@@ -694,7 +688,6 @@ Commands:
   reset [id]         Reset failed jobs to pending
   history            Show recent job history
   cancel [id]        Cancel a batch
-  sync               Sync SQLite data to Convex cloud (requires CONVEX_URL)
   help               Show this help message
 
 useapi.net Commands:
@@ -800,43 +793,8 @@ Cost Summary (useapi.net extended):
   Image Upscale 4K      Paid accounts only
 
 Database:
-  The CLI uses SQLite by default. Set CONVEX_URL to use Convex cloud storage.
-  Use 'sync' command to migrate existing SQLite data to Convex.
+  The CLI uses a local SQLite database (vclaw-cli.db) for batch/job tracking.
 `);
-}
-
-/**
- * Run sync command - migrate SQLite data to Convex
- */
-export async function runSync(): Promise<void> {
-  if (!isUsingConvex()) {
-    console.error("Error: CONVEX_URL environment variable is not set.");
-    console.log("To use Convex cloud storage, set:");
-    console.log("  export CONVEX_URL=https://your-project.convex.cloud");
-    console.log("\nTo deploy Convex functions:");
-    console.log("  cd convex && npx convex deploy");
-    return;
-  }
-
-  console.log("\n=== Syncing SQLite to Convex ===\n");
-  console.log("This will migrate all batches and jobs from local SQLite to Convex cloud.");
-  console.log("Existing data in Convex will NOT be overwritten.\n");
-
-  try {
-    const result = await syncToConvex();
-    console.log(`\n✓ Sync complete!`);
-    console.log(`  Batches migrated: ${result.batches}`);
-    console.log(`  Jobs migrated: ${result.jobs}`);
-    console.log("\nYou can now use Convex as your database backend.");
-    console.log("Data will be available across all devices.\n");
-  } catch (error) {
-    const errMsg = error instanceof Error ? error.message : String(error);
-    console.error(`\nSync failed: ${errMsg}`);
-    console.log("\nMake sure:");
-    console.log("  1. CONVEX_URL is set correctly");
-    console.log("  2. Convex functions are deployed (npx convex deploy)");
-    console.log("  3. Local SQLite database exists (veo-cli.db)");
-  }
 }
 
 // ============================================================================

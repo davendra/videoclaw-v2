@@ -187,7 +187,6 @@ import {
   runHistory,
   runCancel,
   runHelp,
-  runSync,
   runUseApiAccounts,
   runUseApiCaptcha,
   runUseApiHealth,
@@ -892,9 +891,6 @@ async function main() {
       return;
     case "cancel":
       await runCancel(cliOptions.batchId);
-      return;
-    case "sync":
-      await runSync();
       return;
     // useapi.net subcommands
     case "useapi:accounts":

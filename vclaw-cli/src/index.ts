@@ -130,7 +130,7 @@ export type {
   ReferenceVideoOptions,
 } from "./generation";
 
-// Database module exports (unified SQLite/Convex interface)
+// Database module exports (SQLite)
 export {
   initDB,
   closeDB,
@@ -160,7 +160,6 @@ export {
   getUseApiHistory,
   getUseApiStats,
   cleanupUseApiHistory,
-  syncToConvex,
 } from "./db-unified";
 export type {
   BatchStatus,
