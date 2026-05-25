@@ -1,4 +1,0 @@
-interface:
-  display_name: "Presenter Video"
-  short_description: "Create presenter-led narrated videos from PDFs, slide decks, briefings, or scor..."
-  default_prompt: "Use $presenter-video for this request. Follow the skill workflow, load referenced resources only when needed, and report verification evidence."

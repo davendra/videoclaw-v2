@@ -140,13 +140,6 @@
       "status": "imported"
     },
     {
-      "id": "presenter-video",
-      "category": "video",
-      "status": "ported-from-videoclaw",
-      "role": "legacy-parent",
-      "supersededBy": "brand-presenter"
-    },
-    {
       "id": "ralph",
       "category": "workflow",
       "status": "imported"

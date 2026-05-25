@@ -34,5 +34,6 @@ bash scripts/check-omx-alias.sh
 bash scripts/check-movie-director-wrappers.sh
 bash scripts/check-cleanroom-docs.sh
 bash scripts/check-skill-frontdoor.sh
+node scripts/check-artifact-schema-coverage.mjs
 
 echo "release-readiness-lite checks passed"

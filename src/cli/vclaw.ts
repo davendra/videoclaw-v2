@@ -21,7 +21,52 @@ import { writeStoryboardMarkdownReview } from '../video/storyboard-markdown.js';
 import { doctorProject } from '../video/doctor.js';
 import { doctorPortfolio } from '../video/doctor-portfolio.js';
 import { importLegacyProjects } from '../video/legacy-import.js';
-import { listProjects } from '../video/projects.js';
+import { listProjects, isProjectSlug } from '../video/projects.js';
+
+const RESERVED_SLUG_NAMES = new Set([
+  'history',
+  'artifacts',
+  'checkpoints',
+  'events',
+  'state',
+  'outputs',
+  'assets',
+  'obsidian',
+  'characters',
+  'notes',
+  'tmp',
+]);
+
+function validateInitSlug(value: string): void {
+  if (value.length < 3 || value.length > 64) {
+    throw new Error(
+      `video init: slug must be 3-64 chars (got ${value.length}): ${JSON.stringify(value)}`,
+    );
+  }
+  if (value.startsWith('-')) {
+    throw new Error(
+      `video init: slug cannot start with '-' (looks like a CLI flag): ${JSON.stringify(value)}. ` +
+      `If you meant to pass --project as a flag value, that's the argv-as-slug bug — run \`vclaw video init <real-slug>\` instead.`,
+    );
+  }
+  if (!isProjectSlug(value)) {
+    throw new Error(
+      `video init: slug must match /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/ (got ${JSON.stringify(value)}). ` +
+      `Lowercase letters, digits, and single hyphens only; must start and end with [a-z0-9].`,
+    );
+  }
+  if (RESERVED_SLUG_NAMES.has(value)) {
+    throw new Error(
+      `video init: slug ${JSON.stringify(value)} is a reserved per-project directory name. ` +
+      `Reserved: ${[...RESERVED_SLUG_NAMES].sort().join(', ')}.`,
+    );
+  }
+  if (value.includes('--')) {
+    throw new Error(
+      `video init: slug cannot contain consecutive hyphens '--' (got ${JSON.stringify(value)}).`,
+    );
+  }
+}
 import { exportProjectToObsidian } from '../video/obsidian-export.js';
 import { buildProjectIndex, writeProjectIndex } from '../video/project-index.js';
 import { buildPortfolioMetrics } from '../video/metrics.js';
@@ -1039,6 +1084,7 @@ async function handleVideoInit(args: string[]): Promise<void> {
   if (!slug) {
     throw new Error('video init requires a project slug');
   }
+  validateInitSlug(slug);
   const root = parseFlagValue(args, '--root') ?? process.cwd();
   const mode = (parseFlagValue(args, '--mode') ?? 'storyboard') as VideoProductionMode;
   const pipeline = getBuiltinPipelineManifest(mode);

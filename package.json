@@ -69,6 +69,8 @@
     "check:movie-director-wrappers": "bash scripts/check-movie-director-wrappers.sh",
     "check:cleanroom-docs": "bash scripts/check-cleanroom-docs.sh",
     "check:skill-frontdoor": "bash scripts/check-skill-frontdoor.sh",
+    "check:artifact-schema-coverage": "node scripts/check-artifact-schema-coverage.mjs",
+    "check:artifact-schema-coverage:strict": "node scripts/check-artifact-schema-coverage.mjs --strict",
     "check:release-readiness-lite": "bash scripts/check-release-readiness-lite.sh",
     "prepublishOnly": "npm test"
   },
