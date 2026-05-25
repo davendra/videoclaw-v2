@@ -265,7 +265,9 @@ export const DEFAULT_PROVIDER_REGISTRY: VideoProviderDescriptor[] = [
       },
     ],
     notes: [
-      "Prepared as a first-wave UseAPI-backed adapter before direct Runway support lands.",
+      "Production native transport (src/video/native-runway.ts) — Seedance-2 via Runway by default; override with VCLAW_RUNWAY_MODEL.",
+      "Mode defaults to 'explore' (free, queued, single active slot); set VCLAW_RUNWAY_MODE=credits for paid faster path.",
+      "Requires USEAPI_API_TOKEN; account must be pre-registered with UseAPI (see registerRunwayAccount in providers/runway-useapi.ts).",
     ],
   },
   {

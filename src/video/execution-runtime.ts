@@ -32,7 +32,7 @@ function adapterEnvVarForRoute(routeId: ProviderRouteId): string {
 }
 
 function builtinAdapterCommandForRoute(routeId: ProviderRouteId): string | null {
-  if (!(routeId === 'seedance-direct' || routeId === 'veo-useapi')) {
+  if (!(routeId === 'seedance-direct' || routeId === 'veo-useapi' || routeId === 'runway-useapi')) {
     return null;
   }
   const scriptPath = fileURLToPath(new URL('../cli/provider-adapter.js', import.meta.url));

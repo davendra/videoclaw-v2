@@ -30,7 +30,10 @@ const ROUTE_REQUIRED_DEPENDENCIES: Record<ProviderRouteId, ExecutableName[]> = {
   'veo-direct': ['bun', 'ffmpeg'],
   'veo-useapi': ['python3', 'bun', 'ffmpeg'],
   'seedance-direct': ['python3', 'ffmpeg'],
-  'runway-useapi': ['python3', 'bun', 'ffmpeg'],
+  // runway-useapi native transport is pure Node (fetch + fs), no python/bun
+  // shell-outs. ffmpeg is still useful for downstream stitching/post but is
+  // not strictly required for the route itself to deliver mp4s.
+  'runway-useapi': ['ffmpeg'],
   'kling-useapi': ['python3', 'bun', 'ffmpeg'],
 };
 
@@ -38,7 +41,7 @@ const ROUTE_MATURITY: Record<ProviderRouteId, 'production' | 'scaffold'> = {
   'veo-direct': 'production',
   'veo-useapi': 'production',
   'seedance-direct': 'production',
-  'runway-useapi': 'scaffold',
+  'runway-useapi': 'production',
   'kling-useapi': 'scaffold',
 };
 
@@ -53,6 +56,7 @@ const ROUTE_ADAPTER_ENV_VAR: Record<ProviderRouteId, string> = {
 const ROUTE_COMMAND_ENV_VARS: Partial<Record<ProviderRouteId, string[]>> = {
   'veo-useapi': ['VCLAW_VEO_USEAPI_SUBMIT_CMD', 'VCLAW_VEO_USEAPI_POLL_CMD', 'VCLAW_VEO_BUN_BIN'],
   'seedance-direct': ['VCLAW_SEEDANCE_DIRECT_SUBMIT_CMD', 'VCLAW_SEEDANCE_DIRECT_POLL_CMD'],
+  'runway-useapi': ['VCLAW_RUNWAY_USEAPI_SUBMIT_CMD', 'VCLAW_RUNWAY_USEAPI_POLL_CMD', 'VCLAW_RUNWAY_USEAPI_CANCEL_CMD'],
 };
 
 function findExecutable(command: ExecutableName): string | undefined {

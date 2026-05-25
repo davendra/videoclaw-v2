@@ -23,7 +23,8 @@ describe('buildProviderStatusReport', () => {
       assert.equal(report.generatedAt, '2026-04-20T00:00:00.000Z');
       assert.ok(report.routes.some((route) => route.routeId === 'veo-useapi' && route.availability === 'available'));
       assert.ok(report.routes.some((route) => route.routeId === 'seedance-direct' && route.availability === 'available'));
-      assert.ok(report.routes.some((route) => route.routeId === 'runway-useapi' && route.availability === 'degraded'));
+      assert.ok(report.routes.some((route) => route.routeId === 'runway-useapi' && route.availability === 'available'));
+      assert.ok(report.routes.some((route) => route.routeId === 'kling-useapi' && route.availability === 'degraded'));
     } finally {
       await rm(root, { recursive: true, force: true });
     }

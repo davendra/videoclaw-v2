@@ -1,5 +1,6 @@
 import { submitSeedanceDirectNative, pollSeedanceDirectNative, cancelSeedanceDirectNative } from './native-seedance.js';
 import { submitVeoUseApiNative, pollVeoUseApiNative } from './native-veo.js';
+import { submitRunwayUseApiNative, pollRunwayUseApiNative, cancelRunwayUseApiNative } from './native-runway.js';
 import type { ProviderRouteId } from './provider-platform/types.js';
 import type { VideoExecutionCancelResult, VideoExecutionPayload, VideoExecutionPollResult } from './types.js';
 
@@ -50,6 +51,28 @@ export async function runBuiltinProviderAdapter(
       } satisfies VideoExecutionCancelResult;
     }
     return submitVeoUseApiNative(input as unknown as VideoExecutionPayload, {
+      env: options.env,
+    });
+  }
+
+  if (route === 'runway-useapi') {
+    if (input.action === 'poll') {
+      return pollRunwayUseApiNative({
+        outputDir: String(input.outputDir ?? ''),
+        externalJobId: String(input.externalJobId ?? ''),
+        workspaceRoot: String(input.workspaceRoot ?? ''),
+      }, {
+        env: options.env,
+      }) as Promise<VideoExecutionPollResult>;
+    }
+    if (input.action === 'cancel') {
+      return cancelRunwayUseApiNative({
+        outputDir: String(input.outputDir ?? ''),
+        externalJobId: String(input.externalJobId ?? ''),
+        workspaceRoot: String(input.workspaceRoot ?? ''),
+      }) as Promise<VideoExecutionCancelResult>;
+    }
+    return submitRunwayUseApiNative(input as unknown as VideoExecutionPayload, {
       env: options.env,
     });
   }

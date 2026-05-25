@@ -23,6 +23,12 @@ function routeCommandEnvVars(routeId: ProviderRouteId): { submit: string; poll: 
         poll: 'VCLAW_VEO_USEAPI_POLL_CMD',
         cancel: 'VCLAW_VEO_USEAPI_CANCEL_CMD',
       };
+    case 'runway-useapi':
+      return {
+        submit: 'VCLAW_RUNWAY_USEAPI_SUBMIT_CMD',
+        poll: 'VCLAW_RUNWAY_USEAPI_POLL_CMD',
+        cancel: 'VCLAW_RUNWAY_USEAPI_CANCEL_CMD',
+      };
     default:
       throw new Error(`No built-in adapter is implemented for route ${routeId}.`);
   }
