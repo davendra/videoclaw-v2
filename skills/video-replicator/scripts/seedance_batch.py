@@ -166,6 +166,11 @@ def _run_veo_fallback(
         backend=fb_backend,
         videos_dir=vid_dir,
         variations=1,
+        # PR #27: thread omni-flash voice + ref_video kwargs through
+        # so scene specs constructed in Python can activate voice
+        # narration and V2V edit without bypassing the orchestrator.
+        voice=scene.get("voice"),
+        ref_video=scene.get("ref_video"),
     )
 
     return result if result.get("success") else None

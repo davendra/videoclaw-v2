@@ -894,9 +894,9 @@ def print_recovery_commands(
 
         print(f"\n# Scene {scene_num}: {scene.get('error', 'unknown error')}")
         if image_path:
-            print(f'bun run google.ts -p "[scene_{scene_num}] image:{image_path} {prompt_short}" -n 2 -r {ratio} -m {quality}{backend_flag}')
+            print(f'bun run flow.ts -p "[scene_{scene_num}] image:{image_path} {prompt_short}" -n 2 -r {ratio} -m {quality}{backend_flag}')
         else:
-            print(f'bun run google.ts -p "[scene_{scene_num}] {prompt_short}" -n 2 -r {ratio} -m {quality}{backend_flag}')
+            print(f'bun run flow.ts -p "[scene_{scene_num}] {prompt_short}" -n 2 -r {ratio} -m {quality}{backend_flag}')
 
     print(f"\n{'='*60}")
 
@@ -921,7 +921,9 @@ def generate_scene(
     allow_stale: bool = False,
     f2v_loop: bool = False,
     image_run_id: str | None = None,
-    reference_images: list[str] | None = None
+    reference_images: list[str] | None = None,
+    voice: str | None = None,
+    ref_video: str | None = None,
 ) -> dict:
     """
     Generate a single scene video using veo-cli.
@@ -1126,7 +1128,7 @@ def generate_scene(
 
         # Build veo-cli command
         cmd = [
-            "bun", "run", "google.ts",
+            "bun", "run", "flow.ts",
             "-p", veo_prompt,
             "-n", str(num_outputs),  # Number of outputs
             "-r", ratio,             # landscape or portrait
@@ -1139,8 +1141,16 @@ def generate_scene(
             # Skip confirmation for useapi backend (scripting mode)
             cmd.append("--yes")
 
+        # PR #27: thread voice (omni-flash narration preset → referenceAudio_1) through to vclaw-cli.
+        if voice:
+            cmd.extend(["--voice", voice])
+
+        # PR #27: thread ref-video (omni-flash V2V edit mediaGenerationId → referenceVideo_1) through.
+        if ref_video:
+            cmd.extend(["--ref-video", ref_video])
+
         backend_info = f" --backend {backend}" if backend and backend != "direct" else ""
-        logger.debug("Running: bun run google.ts -p \"[%s] ...\" -n %d -r %s -m %s%s", tag, num_outputs, ratio, quality, backend_info)
+        logger.debug("Running: bun run flow.ts -p \"[%s] ...\" -n %d -r %s -m %s%s", tag, num_outputs, ratio, quality, backend_info)
 
         # v2.11: Track generation start time for timestamp validation
         # Allow 60s tolerance for clock drift between systems
@@ -1691,7 +1701,7 @@ def generate_chained_scenes(
 
         # Build veo-cli command
         cmd = [
-            "bun", "run", "google.ts",
+            "bun", "run", "flow.ts",
             "-p", veo_prompt,
             "-n", "1",
             "-r", ratio,
@@ -2165,7 +2175,7 @@ def generate_chained_lipsync_scenes(
 
             # veo-cli backend (direct/useapi)
             cmd = [
-                "bun", "run", "google.ts",
+                "bun", "run", "flow.ts",
                 "-p", veo_prompt,
                 "-n", "1",
                 "-r", ratio,
@@ -3052,9 +3062,9 @@ def validate_preflight(
         run_id = get_current_run_id(project_path)
 
     # Check veo-cli path
-    veo_google_ts = os.path.join(args.veo_path, "google.ts")
+    veo_google_ts = os.path.join(args.veo_path, "flow.ts")
     if not os.path.exists(veo_google_ts):
-        result["errors"].append(f"veo-cli not found: {args.veo_path}/google.ts")
+        result["errors"].append(f"vclaw-cli not found: {args.veo_path}/flow.ts")
         result["valid"] = False
 
     # Check Bun is installed
@@ -3410,7 +3420,7 @@ def run_preflight_validation(
     logger.info("Backend:")
 
     # Check veo-cli
-    veo_google_ts = os.path.join(args.veo_path, "google.ts")
+    veo_google_ts = os.path.join(args.veo_path, "flow.ts")
     if os.path.exists(veo_google_ts):
         logger.info("  veo-cli found at %s", args.veo_path)
     else:
@@ -3510,9 +3520,9 @@ def validate_dry_run(scenes: dict[str, str], args: argparse.Namespace, transitio
         run_id = get_current_run_id(project_path)
 
     # Check veo-cli path
-    veo_google_ts = os.path.join(args.veo_path, "google.ts")
+    veo_google_ts = os.path.join(args.veo_path, "flow.ts")
     if not os.path.exists(veo_google_ts):
-        errors.append(f"veo-cli not found: {args.veo_path}/google.ts")
+        errors.append(f"vclaw-cli not found: {args.veo_path}/flow.ts")
     else:
         logger.info("veo-cli found: %s", args.veo_path)
 
@@ -3601,7 +3611,7 @@ def validate_dry_run(scenes: dict[str, str], args: argparse.Namespace, transitio
             veo_prompt = f"[{tag}] image:{frame_path} {prompt[:30]}..."
         else:
             veo_prompt = f"[{tag}] {prompt[:30]}..."
-        logger.info("  bun run google.ts -p \"%s\" -n 2 -r %s -m %s", veo_prompt, effective_ratio, args.quality)
+        logger.info("  bun run flow.ts -p \"%s\" -n 2 -r %s -m %s", veo_prompt, effective_ratio, args.quality)
 
     # Summary
     logger.info("=" * 60)
