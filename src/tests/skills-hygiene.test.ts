@@ -29,6 +29,9 @@ describe('skills hygiene', () => {
     const files = (await walkFiles(skillsRoot)).filter((path) => {
       if (path.includes('/video-replicator-workspace/')) return false;
       if (path.includes('/assets/')) return false;
+      // skills-auditor legitimately mentions the patterns it audits FOR
+      // (e.g., '.claude/skills/...') as part of its checklist content.
+      if (path.includes('/skills-auditor/')) return false;
       return (
         path.endsWith('SKILL.md')
         || path.endsWith('.md')

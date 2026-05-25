@@ -66,9 +66,10 @@ Ask these one at a time. Stop after each answer before proceeding to the next.
 **Reference**: `references/audio-strategy.md`
 
 ### Q7 — Backend preference?
-"Speed vs quality: Fast draft ($0.05/scene, ~90s) / Quality final (10× cost, ~3.5min) / Free (slow, direct backend)"
+"Speed vs quality: Fast (`veo-3.1-fast`, default) / Quality (`veo-3.1-quality`, 8s-only) / Lite (`veo-3.1-lite`, cheapest) / Free (`veo-3.1-lite-low-priority`, Ultra plan only) / Omni Flash (`omni-flash`, audio-native voice narration)"
 
-**Maps to**: `--quality fast|quality`, `--backend useapi|direct|seedance`
+**Maps to**: `--quality fast|quality|lite|free|omni-flash`, `--backend useapi|direct|seedance`
+**Credit reference**: `vclaw-cli/docs/GOOGLE-FLOW-V1.md` for the full model/credit matrix
 
 ---
 
@@ -82,6 +83,7 @@ Ask these one at a time. Stop after each answer before proceeding to the next.
 | Lip-sync / talking presenter | `seedance` | `audio-lipsync` |
 | BGM clone from audio reference | `seedance` | `omni_reference` + `--audio-ref` |
 | Pure concept, no assets | `useapi` | `text-to-video` or `seedance_omni.py` |
+| Audio-native / voice narration brief | `useapi` | `omni-flash` (see `vclaw-cli/docs/GOOGLE-FLOW-V1.md` for voice preset names) |
 | Budget-sensitive / development | `direct` | any |
 
 ---

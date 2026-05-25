@@ -1,16 +1,32 @@
 {
-  "generatedFrom": "manual-import-baseline",
+  "generatedFrom": "phase-3a-skill-consolidation",
   "skills": [
-    { "id": "ai-slop-cleaner", "category": "workflow", "status": "imported" },
-    { "id": "autopilot", "category": "workflow", "status": "imported" },
+    {
+      "id": "ai-slop-cleaner",
+      "category": "workflow",
+      "status": "imported"
+    },
+    {
+      "id": "autopilot",
+      "category": "workflow",
+      "status": "imported"
+    },
     {
       "id": "brand-presenter",
       "category": "video",
       "status": "native-generic",
       "role": "canonical-entry",
-      "specializations": ["davendra-presenter", "nex-presenter", "bunty"]
+      "specializations": [
+        "davendra-presenter",
+        "nex-presenter",
+        "bunty"
+      ]
     },
-    { "id": "build-fix", "category": "workflow", "status": "imported" },
+    {
+      "id": "build-fix",
+      "category": "workflow",
+      "status": "imported"
+    },
     {
       "id": "bunty",
       "category": "video",
@@ -18,7 +34,16 @@
       "aliasOf": "brand-presenter",
       "role": "compatibility-alias"
     },
-    { "id": "cancel", "category": "workflow", "status": "imported" },
+    {
+      "id": "cancel",
+      "category": "workflow",
+      "status": "imported"
+    },
+    {
+      "id": "character-creator",
+      "category": "video",
+      "status": "imported"
+    },
     {
       "id": "character-library",
       "category": "video",
@@ -26,10 +51,21 @@
       "specializes": "character-creator",
       "role": "specialist"
     },
-    { "id": "character-creator", "category": "video", "status": "imported" },
-    { "id": "code-review", "category": "workflow", "status": "imported" },
-    { "id": "configure-notifications", "category": "workflow", "status": "imported" },
-    { "id": "creative-brief", "category": "video", "status": "imported" },
+    {
+      "id": "code-review",
+      "category": "workflow",
+      "status": "imported"
+    },
+    {
+      "id": "configure-notifications",
+      "category": "workflow",
+      "status": "imported"
+    },
+    {
+      "id": "creative-brief",
+      "category": "video",
+      "status": "imported"
+    },
     {
       "id": "davendra-presenter",
       "category": "video",
@@ -37,8 +73,16 @@
       "aliasOf": "brand-presenter",
       "role": "compatibility-alias"
     },
-    { "id": "deep-interview", "category": "workflow", "status": "imported" },
-    { "id": "deepsearch", "category": "workflow", "status": "imported" },
+    {
+      "id": "deep-interview",
+      "category": "workflow",
+      "status": "imported"
+    },
+    {
+      "id": "deepsearch",
+      "category": "workflow",
+      "status": "imported"
+    },
     {
       "id": "director-video",
       "category": "video",
@@ -46,10 +90,26 @@
       "specializes": "video-framework",
       "role": "specialist"
     },
-    { "id": "doctor", "category": "workflow", "status": "imported" },
-    { "id": "git-master", "category": "workflow", "status": "imported" },
-    { "id": "help", "category": "workflow", "status": "imported" },
-    { "id": "hud", "category": "workflow", "status": "imported" },
+    {
+      "id": "doctor",
+      "category": "workflow",
+      "status": "imported"
+    },
+    {
+      "id": "git-master",
+      "category": "workflow",
+      "status": "imported"
+    },
+    {
+      "id": "help",
+      "category": "workflow",
+      "status": "imported"
+    },
+    {
+      "id": "hud",
+      "category": "workflow",
+      "status": "imported"
+    },
     {
       "id": "movie-director",
       "category": "video",
@@ -64,19 +124,90 @@
       "aliasOf": "brand-presenter",
       "role": "compatibility-alias"
     },
-    { "id": "note", "category": "workflow", "status": "imported" },
-    { "id": "omx-setup", "category": "workflow", "status": "imported" },
-    { "id": "pipeline", "category": "workflow", "status": "imported" },
-    { "id": "ralph", "category": "workflow", "status": "imported" },
-    { "id": "ralph-init", "category": "workflow", "status": "imported" },
-    { "id": "ralplan", "category": "workflow", "status": "imported" },
-    { "id": "review", "category": "workflow", "status": "imported" },
-    { "id": "security-review", "category": "workflow", "status": "imported" },
-    { "id": "seedance-prompts", "category": "video", "status": "imported" },
-    { "id": "skill", "category": "workflow", "status": "imported" },
-    { "id": "studio-mode", "category": "workflow", "status": "imported" },
-    { "id": "team", "category": "workflow", "status": "imported" },
-    { "id": "trace", "category": "workflow", "status": "imported" },
+    {
+      "id": "note",
+      "category": "workflow",
+      "status": "imported"
+    },
+    {
+      "id": "omx-setup",
+      "category": "workflow",
+      "status": "imported"
+    },
+    {
+      "id": "pipeline",
+      "category": "workflow",
+      "status": "imported"
+    },
+    {
+      "id": "presenter-video",
+      "category": "video",
+      "status": "ported-from-videoclaw",
+      "role": "legacy-parent",
+      "supersededBy": "brand-presenter"
+    },
+    {
+      "id": "ralph",
+      "category": "workflow",
+      "status": "imported"
+    },
+    {
+      "id": "ralph-init",
+      "category": "workflow",
+      "status": "imported"
+    },
+    {
+      "id": "ralplan",
+      "category": "workflow",
+      "status": "imported"
+    },
+    {
+      "id": "review",
+      "category": "workflow",
+      "status": "imported"
+    },
+    {
+      "id": "security-review",
+      "category": "workflow",
+      "status": "imported"
+    },
+    {
+      "id": "seedance-music-video-prompts",
+      "category": "video",
+      "status": "ported-from-videoclaw",
+      "specializes": "seedance-prompts",
+      "role": "specialist"
+    },
+    {
+      "id": "seedance-prompts",
+      "category": "video",
+      "status": "imported"
+    },
+    {
+      "id": "skill",
+      "category": "workflow",
+      "status": "imported"
+    },
+    {
+      "id": "skills-auditor",
+      "category": "workflow",
+      "status": "ported-from-videoclaw"
+    },
+    {
+      "id": "studio-mode",
+      "category": "workflow",
+      "status": "imported"
+    },
+    {
+      "id": "team",
+      "category": "workflow",
+      "status": "imported"
+    },
+    {
+      "id": "trace",
+      "category": "workflow",
+      "status": "imported"
+    },
     {
       "id": "ugc",
       "category": "video",
@@ -117,11 +248,11 @@
       ]
     },
     {
-      "id": "video-replicator",
+      "id": "video-portfolio-ops",
       "category": "video",
-      "status": "imported",
+      "status": "native-clean-room",
       "specializes": "video-framework",
-      "role": "compatibility-deep-surface"
+      "role": "specialist"
     },
     {
       "id": "video-post",
@@ -138,18 +269,18 @@
       "role": "specialist"
     },
     {
-      "id": "video-portfolio-ops",
+      "id": "video-release-readiness",
       "category": "video",
       "status": "native-clean-room",
       "specializes": "video-framework",
       "role": "specialist"
     },
     {
-      "id": "video-release-readiness",
+      "id": "video-replicator",
       "category": "video",
-      "status": "native-clean-room",
+      "status": "imported",
       "specializes": "video-framework",
-      "role": "specialist"
+      "role": "compatibility-deep-surface"
     },
     {
       "id": "video-review-ui-qa",
@@ -172,8 +303,20 @@
       "specializes": "video-framework",
       "role": "specialist"
     },
-    { "id": "web-clone", "category": "workflow", "status": "imported" },
-    { "id": "worker", "category": "workflow", "status": "imported" },
-    { "id": "youtube-audio", "category": "video", "status": "imported" }
+    {
+      "id": "web-clone",
+      "category": "workflow",
+      "status": "imported"
+    },
+    {
+      "id": "worker",
+      "category": "workflow",
+      "status": "imported"
+    },
+    {
+      "id": "youtube-audio",
+      "category": "video",
+      "status": "imported"
+    }
   ]
 }
