@@ -22,18 +22,15 @@ from pathlib import Path
 # scripts/ directory
 SCRIPTS_DIR = Path(__file__).resolve().parent
 
-# video-replicator-veo-cli/
-REPLICATOR_ROOT = SCRIPTS_DIR.parent.parent.parent.parent
-
-# video-creation-projects/ (workspace root)
-WORKSPACE_ROOT = REPLICATOR_ROOT.parent
+# videoclaw project root (2 levels up from scripts/video/)
+_PROJECT_ROOT = SCRIPTS_DIR.parent.parent
 
 # Default paths (overridable via environment variables)
 VEO_CLI_PATH: str = os.environ.get(
-    "VEO_CLI_PATH", str(WORKSPACE_ROOT / "veo-cli")
+    "VEO_CLI_PATH", str(_PROJECT_ROOT / "veo-cli")
 )
 PROJECT_BASE: str = os.environ.get(
-    "VIDEO_REPLICATOR_PROJECTS", str(REPLICATOR_ROOT / "projects")
+    "VIDEO_REPLICATOR_PROJECTS", str(Path.home() / "videoclaw" / "projects")
 )
 
 
@@ -196,7 +193,17 @@ SEEDANCE_CREATE_URL: str = f"{SEEDANCE_BASE_URL}/api/v3/tasks/create"
 SEEDANCE_QUERY_URL: str = f"{SEEDANCE_BASE_URL}/api/v3/tasks/query"
 SEEDANCE_CANCEL_URL: str = f"{SEEDANCE_BASE_URL}/api/v3/tasks/cancel"
 SEEDANCE_BALANCE_URL: str = f"{SEEDANCE_BASE_URL}/api/v3/balance"
-SEEDANCE_MODEL_ID: str = "st-ai/super-seed2"
+# ark/seedance-2.0 (default) vs legacy st-ai/super-seed2
+# Set SEEDANCE_USE_ARK_API=false to revert to the legacy model.
+SEEDANCE_USE_ARK_API: bool = os.environ.get("SEEDANCE_USE_ARK_API", "true").lower() != "false"
+SEEDANCE_MODEL_ID_ARK: str = "ark/seedance-2.0"
+SEEDANCE_MODEL_ID_LEGACY: str = "st-ai/super-seed2"
+SEEDANCE_MODEL_ID: str = SEEDANCE_MODEL_ID_ARK if SEEDANCE_USE_ARK_API else SEEDANCE_MODEL_ID_LEGACY
+
+# ark/seedance-2.0 specific defaults
+SEEDANCE_DEFAULT_RESOLUTION: str = "720p"
+SEEDANCE_GENERATE_AUDIO: bool = True
+SEEDANCE_WATERMARK: bool = False
 
 SEEDANCE_QUALITY_MAP: dict = {
     "fast": "seedance_2.0_fast",
@@ -211,9 +218,9 @@ SEEDANCE_RATIO_MAP: dict = {
 
 SEEDANCE_MIN_DURATION: int = 4
 SEEDANCE_MAX_DURATION: int = 15
-SEEDANCE_DEFAULT_DURATION: int = 8
+SEEDANCE_DEFAULT_DURATION: int = 15
 SEEDANCE_POLL_INTERVAL: int = 5   # seconds between status polls
-SEEDANCE_MAX_POLL_TIME: int = 600  # 10 minutes max wait
+SEEDANCE_MAX_POLL_TIME: int = 1200  # 20 minutes max wait per task
 
 CATBOX_UPLOAD_URL: str = "https://catbox.moe/user/api.php"
 UGUU_UPLOAD_URL: str = "https://uguu.se/upload"
@@ -281,13 +288,13 @@ AMIX_DROPOUT_TRANSITION: int = 600
 # URLs on these domains are automatically re-downloaded and re-uploaded to a
 # China-accessible CDN (imgbb or xskill) before being sent to the Seedance API.
 SEEDANCE_REHOST_DOMAINS: list = [
-    "r2.dev",         # Cloudflare R2 (Go Bananas image CDN)
     "catbox.moe",     # catbox uploads (blocked from China)
     "uguu.se",        # uguu temporary uploads (expire ~48h, not China-reliable)
+    # Note: r2.dev (Cloudflare R2) removed — Go Bananas R2 URLs are globally accessible
 ]
 
 # Seedance Dead Task Detection (v2.45) — detect stalled tasks in poll loop
-SEEDANCE_DEAD_TASK_THRESHOLD: int = 120  # seconds with no updated_at change → assume dead
+SEEDANCE_DEAD_TASK_THRESHOLD: int = 1200  # seconds with no updated_at change → assume dead (I2V can take 10-20 min)
 
 # Seedance Smart Polling (v2.37) — initial delay then longer intervals
 SEEDANCE_INITIAL_POLL_DELAY: int = 30  # Wait 30s before first poll (task won't be done sooner)
@@ -368,6 +375,21 @@ SEEDANCE_BATCH_MAX_WORKERS: int = 20          # max concurrent pollers
 SEEDANCE_BATCH_POLL_TIMEOUT: int = 1800       # 30 min default per task
 SEEDANCE_BATCH_CHECKPOINT_INTERVAL: int = 1   # save after every N completions
 
+# ============================================================================
+# Seedance Webhook Settings (v2.46)
+# ============================================================================
+
+SEEDANCE_WEBHOOK_ENABLED: bool = os.environ.get("SEEDANCE_WEBHOOK_ENABLED", "true").lower() != "false"
+SEEDANCE_WEBHOOK_PORT: int = int(os.environ.get("SEEDANCE_WEBHOOK_PORT", "0"))  # 0 = auto
+SEEDANCE_WEBHOOK_USE_TUNNEL: bool = os.environ.get("SEEDANCE_WEBHOOK_USE_TUNNEL", "true").lower() != "false"
+SEEDANCE_WEBHOOK_PATH: str = "/webhook/seedance"
+
+# xskill.ai Asset Library (character reference images → Asset URIs bypass content filter)
+SEEDANCE_ASSET_GROUPS_URL: str = f"{SEEDANCE_BASE_URL}/api/v3/assets/groups"
+SEEDANCE_ASSETS_URL: str = f"{SEEDANCE_BASE_URL}/api/v3/assets"
+SEEDANCE_ASSET_GROUP_NAME: str = "videoclaw-characters"
+SEEDANCE_ASSET_CACHE_FILE: str = str(Path.home() / ".videoclaw" / "asset_cache.json")
+
 
 # ============================================================================
 # useapi.net Backend Settings (Extend Chain, v2.38)
@@ -383,7 +405,10 @@ USEAPI_JOBS_URL: str = f"{USEAPI_BASE_URL}/google-flow/jobs"      # append /{job
 USEAPI_MODEL_MAP: dict = {
     "fast": "veo-3.1-fast",
     "quality": "veo-3.1-quality",
-    "free": "veo-3.1-fast-relaxed",
+    "lite": "veo-3.1-lite",
+    "free": "veo-3.1-lite-low-priority",   # veo-3.1-fast-relaxed was removed by the API
+    "relaxed": "veo-3.1-lite-low-priority",
+    "omni-flash": "omni-flash",
 }
 
 USEAPI_POLL_INTERVAL: int = 3       # seconds between job status polls
@@ -392,6 +417,18 @@ USEAPI_REQUEST_TIMEOUT: int = 30    # HTTP request timeout (non-generation)
 USEAPI_GENERATION_TIMEOUT: int = 180  # 3 minutes for video generation (sync response)
 USEAPI_DOWNLOAD_TIMEOUT: int = 120  # video download timeout
 USEAPI_MAX_IMAGE_SIZE: int = 20 * 1024 * 1024  # 20MB upload limit
+
+# Google Flow v1 video duration (seconds): 4/6 Ultra-only on Veo, 10 omni-flash only.
+USEAPI_DEFAULT_DURATION: int = 8
+
+# The 30 Google Flow voice-narration presets (referenceAudio_1..5).
+USEAPI_VOICE_PRESETS: list = [
+    "Achird", "Achernar", "Algieba", "Algenib", "Alnilam", "Aoede", "Autonoe",
+    "Callirrhoe", "Charon", "Despina", "Enceladus", "Erinome", "Fenrir", "Gacrux",
+    "Iapetus", "Kore", "Laomedeia", "Leda", "Orus", "Puck", "Pulcherrima",
+    "Rasalgethi", "Sadachbia", "Sadaltager", "Schedar", "Sulafat", "Umbriel",
+    "Vindemiatrix", "Zephyr", "Zubenelgenubi",
+]
 
 # Extend Chain defaults
 EXTEND_CHAIN_OVERLAP_TRIM: float = 1.0  # seconds to trim from extension starts
@@ -402,7 +439,7 @@ EXTEND_CHAIN_SEGMENT_DURATION: float = 8.0  # approximate duration per segment
 # Story Engine & Film Pipeline Settings (v2.37)
 # ============================================================================
 
-GEMINI_FLASH_MODEL: str = os.environ.get("GEMINI_FLASH_MODEL", "gemini-2.0-flash")
+GEMINI_FLASH_MODEL: str = os.environ.get("GEMINI_FLASH_MODEL", "gemini-3-flash-preview")
 GEMINI_PRO_MODEL: str = os.environ.get("GEMINI_PRO_MODEL", "gemini-2.0-pro-exp")
 STORY_ENGINE_DURATIONS: list = [4, 6, 8]
 STORY_ENGINE_DEFAULT_SHOTS: int = 6

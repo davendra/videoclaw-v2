@@ -43,6 +43,7 @@ import json
 import re
 import sqlite3
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 
 # ============================================================================
@@ -110,6 +111,9 @@ GENRE_KEYWORDS: dict[str, list[str]] = {
         "family", "argument", "confrontation", "confession", "betrayal",
         "forgive", "romance", "kiss",
         "embrace", "lovers", "farewell", "reunion", "longing", "sorrow",
+        "sadness", "determination", "reflecting", "reflects", "peace",
+        "peaceful", "solitude", "contemplat", "memories", "nostalgia",
+        "grief", "hope", "resilience", "warrior",
     ],
     "popscience": [
         "science", "medical", "health", "brain", "cell", "blood",
@@ -500,6 +504,12 @@ class PromptRecord:
     color_palettes: list[str] = field(default_factory=list)
     has_time_segments: bool = False
     has_dialogue: bool = False
+    quality_score: float | None = None
+    generation_count: int = 0
+    success_count: int = 0
+    content_filter_count: int = 0
+    last_used: str | None = None
+    feedback_notes: str = ''
 
 
 @dataclass
@@ -586,17 +596,39 @@ class PromptDB:
 
     def _ensure_db(self):
         """Create and populate DB if it doesn't exist or is empty."""
+        needs_populate = True
         if self.db_path.exists():
             # Check if populated
             try:
                 count = self.conn.execute("SELECT COUNT(*) FROM prompts").fetchone()[0]
                 if count > 0:
-                    return
+                    needs_populate = False
             except sqlite3.OperationalError:
                 pass  # Table doesn't exist, create it
 
-        self._create_schema()
-        self._populate_from_csv()
+        if needs_populate:
+            self._create_schema()
+            self._populate_from_csv()
+
+        # Feedback tracking columns (safe migration — ALTER TABLE ADD COLUMN is idempotent-ish)
+        self._migrate_feedback_columns()
+
+    def _migrate_feedback_columns(self):
+        """Add feedback tracking columns if they don't already exist."""
+        feedback_columns = [
+            ("quality_score", "REAL DEFAULT NULL"),
+            ("generation_count", "INTEGER DEFAULT 0"),
+            ("success_count", "INTEGER DEFAULT 0"),
+            ("content_filter_count", "INTEGER DEFAULT 0"),
+            ("last_used", "TEXT DEFAULT NULL"),
+            ("feedback_notes", "TEXT DEFAULT ''"),
+        ]
+        for col_name, col_def in feedback_columns:
+            try:
+                self.conn.execute(f"ALTER TABLE prompts ADD COLUMN {col_name} {col_def}")
+            except Exception:
+                pass  # Column already exists
+        self.conn.commit()
 
     def _create_schema(self):
         """Create database tables."""
@@ -1074,6 +1106,64 @@ class PromptDB:
         return self._row_to_record(row) if row else None
 
     # ------------------------------------------------------------------
+    # Feedback Tracking
+    # ------------------------------------------------------------------
+
+    def record_result(self, prompt_id: int, quality_score: float, passed: bool, notes: str = '') -> None:
+        """Record a generation result against a prompt for feedback learning.
+
+        Args:
+            prompt_id: The prompt row id.
+            quality_score: Numeric quality score (e.g. 0-100).
+            passed: Whether the generation was successful.
+            notes: Optional free-text notes (content-filter failures detected automatically).
+        """
+        now = datetime.now().isoformat()
+        self.conn.execute("""
+            UPDATE prompts SET
+                quality_score = CASE
+                    WHEN quality_score IS NULL THEN ?
+                    ELSE (quality_score + ?) / 2.0
+                END,
+                generation_count = generation_count + 1,
+                success_count = success_count + CASE WHEN ? THEN 1 ELSE 0 END,
+                content_filter_count = content_filter_count + CASE WHEN ? THEN 0 ELSE
+                    CASE WHEN ? LIKE '%content%filter%' OR ? LIKE '%violation%' THEN 1 ELSE 0 END
+                END,
+                last_used = ?,
+                feedback_notes = CASE
+                    WHEN feedback_notes = '' THEN ?
+                    ELSE feedback_notes || x'0a' || ?
+                END
+            WHERE id = ?
+        """, (quality_score, quality_score, passed, passed, notes, notes, now, notes, notes, prompt_id))
+        self.conn.commit()
+
+    def get_best_exemplars(self, genre: str, limit: int = 5) -> list[PromptRecord]:
+        """Get top-rated prompts for a genre, ranked by quality and success rate.
+
+        Only returns prompts that have been used at least once and have a
+        quality score recorded.
+
+        Args:
+            genre: Genre key to filter by (e.g. "cinematic", "fight").
+            limit: Maximum number of results to return.
+
+        Returns:
+            List of PromptRecord objects, best first.
+        """
+        rows = self.conn.execute("""
+            SELECT p.* FROM prompts p
+            JOIN genre_tags gt ON gt.prompt_id = p.id
+            WHERE gt.genre = ?
+            AND p.generation_count > 0
+            AND p.quality_score IS NOT NULL
+            ORDER BY p.quality_score * (CAST(p.success_count AS REAL) / MAX(p.generation_count, 1)) DESC
+            LIMIT ?
+        """, (genre, limit)).fetchall()
+        return [self._row_to_record(row) for row in rows]
+
+    # ------------------------------------------------------------------
     # Genre Auto-Detection
     # ------------------------------------------------------------------
 
@@ -1115,6 +1205,16 @@ class PromptDB:
 
         if not scores:
             return "cinematic"  # Default fallback
+
+        # When both fight and drama score, prefer drama if emotional keywords dominate.
+        # This prevents "warrior + sadness" from being classified as fight.
+        _EMOTIONAL_OVERRIDES = {"sadness", "determination", "reflecting", "reflects",
+            "peace", "peaceful", "solitude", "contemplat", "memories", "emotional",
+            "tears", "cry", "grief", "hope", "longing", "sorrow", "nostalgia"}
+        if "fight" in scores and "drama" in scores:
+            emotional_count = sum(1 for ew in _EMOTIONAL_OVERRIDES if ew in text_lower)
+            if emotional_count >= 1:
+                scores["drama"] += emotional_count * 2  # Boost drama significantly
 
         max_score = max(scores.values())
 
@@ -6268,6 +6368,7 @@ class PromptDB:
             self.db_path.unlink()
         self._conn = None
         self._create_schema()
+        self._migrate_feedback_columns()
         self._populate_from_csv()
 
     # ------------------------------------------------------------------
@@ -6295,6 +6396,12 @@ class PromptDB:
             color_palettes=json.loads(row["color_palettes"]),
             has_time_segments=bool(row["has_time_segments"]),
             has_dialogue=bool(row["has_dialogue"]),
+            quality_score=row["quality_score"],
+            generation_count=row["generation_count"] or 0,
+            success_count=row["success_count"] or 0,
+            content_filter_count=row["content_filter_count"] or 0,
+            last_used=row["last_used"],
+            feedback_notes=row["feedback_notes"] or '',
         )
 
 

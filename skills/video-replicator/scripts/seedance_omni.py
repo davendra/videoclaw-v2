@@ -57,10 +57,7 @@ from config import (
     GEMINI_FLASH_MODEL,
     LANDSCAPE_HEIGHT,
     LANDSCAPE_WIDTH,
-    MIN_VIDEO_SIZE_BYTES,
     SEEDANCE_CREATE_URL,
-    SEEDANCE_DEFAULT_DURATION,
-    SEEDANCE_MAX_POLL_TIME,
     SEEDANCE_MODEL_ID,
     SEEDANCE_OMNI_CREDITS_PER_SEGMENT,
     SEEDANCE_OMNI_CROSSFADE_DURATION,
@@ -70,13 +67,10 @@ from config import (
     SEEDANCE_OMNI_MAX_IMAGES,
     SEEDANCE_OMNI_MAX_SEGMENTS,
     SEEDANCE_OMNI_SEGMENT_DURATION,
-    SEEDANCE_OUTPUT_RESOLUTION,
     SEEDANCE_QUALITY_MAP,
     SEEDANCE_RATIO_MAP,
-    SEEDANCE_UPSCALE_RESOLUTION,
-    STORYBOARD_PANELS_FILE,
 )
-from exceptions import SeedanceError, UploadError
+from exceptions import SeedanceError
 from logging_config import ProgressLogger, setup_logging
 from seedance_client import is_content_violation, pre_validate_prompt, sanitize_prompt
 

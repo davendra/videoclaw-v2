@@ -1,6 +1,6 @@
 # Python Pipeline (opt-in)
 
-The `scripts/video/` directory ships an **optional** Python pipeline for
+The `skills/video-replicator/scripts/` directory ships an **optional** Python pipeline for
 Seedance-targeted prompt direction, character sheet generation, prompt
 critique, scene chaining via last-frame injection, and Omni Flash specific
 flows. It is **not** required for normal `vclaw` usage — the core CLI is
@@ -23,13 +23,13 @@ in the legacy `videoclaw` repo.
 ## Setup
 
 ```bash
-cd scripts/video
+cd skills/video-replicator/scripts
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Requirements (`scripts/video/requirements.txt`):
+Requirements (`skills/video-replicator/scripts/requirements.txt`):
 
 - `google-genai>=1.0.0` — Gemini API for video analysis
 - `requests>=2.31.0` — HTTP
@@ -95,8 +95,8 @@ const exec = promisify(execFile);
 
 const { stdout } = await exec(
   'python3',
-  ['scripts/video/seedance_prompt_director.py', '--compose', JSON.stringify(input)],
-  { cwd: workspaceRoot, env: { ...process.env, PYTHONPATH: 'scripts/video' } },
+  ['skills/video-replicator/scripts/seedance_prompt_director.py', '--compose', JSON.stringify(input)],
+  { cwd: workspaceRoot, env: { ...process.env, PYTHONPATH: 'skills/video-replicator/scripts' } },
 );
 const result = JSON.parse(stdout);
 ```

@@ -47,6 +47,7 @@ Content Filter Notes (Seedance 2.0, updated Feb 2026):
 import json
 import os
 import re
+import threading
 import time
 
 import requests
@@ -56,6 +57,8 @@ from config import (
     SEEDANCE_CREATE_URL,
     SEEDANCE_DEAD_TASK_THRESHOLD,
     SEEDANCE_DEFAULT_DURATION,
+    SEEDANCE_DEFAULT_RESOLUTION,
+    SEEDANCE_GENERATE_AUDIO,
     SEEDANCE_INITIAL_POLL_DELAY,
     SEEDANCE_MAX_DURATION,
     SEEDANCE_MAX_POLL_TIME,
@@ -67,6 +70,8 @@ from config import (
     SEEDANCE_RATIO_MAP,
     SEEDANCE_RATIO_MAP_EXTENDED,
     SEEDANCE_SMART_POLL_INTERVAL,
+    SEEDANCE_USE_ARK_API,
+    SEEDANCE_WATERMARK,
 )
 from exceptions import SeedanceError, SeedanceTimeoutError
 from logging_config import setup_logging
@@ -418,15 +423,30 @@ def create_task(
     ratio: str = "landscape",
     duration: int | None = None,
     service_tier: str = "default",
+    callback_url: str | None = None,
 ) -> str:
     """Create a Seedance video generation task.
 
+    Supports two API formats based on SEEDANCE_USE_ARK_API config:
+
+    **ark/seedance-2.0** (default):
+        - ``image_url`` for first-frame I2V (mutually exclusive with ``reference_images``)
+        - ``reference_images`` array for character refs / multi-image (up to 9)
+        - When both scene image and character refs exist, ALL go into
+          ``reference_images`` (scene image first, then character sheets)
+        - ``reference_videos``, ``reference_audios`` for video/audio refs
+        - Duration as string, ``generate_audio``, ``resolution``, ``watermark``
+
+    **st-ai/super-seed2** (legacy):
+        - ``image_files`` array format with ``functionMode: omni_reference``
+
     Args:
         prompt: Prompt text with optional @image1/@video1/@audio1 references
-        media_files: List of public media URLs (images, videos, audio)
+        media_files: List of public media URLs (images, videos, audio).
+            For ark model: first image = scene frame (I2V), rest = character refs.
         quality: "fast" or "quality"
         ratio: Base ("landscape", "portrait", "square") or extended
-        duration: Video duration in seconds (4-15, default: 8)
+        duration: Video duration in seconds (4-15, default: 15)
         service_tier: "default" or "flex" (50% cost savings)
 
     Returns:
@@ -441,7 +461,7 @@ def create_task(
     dur = duration or SEEDANCE_DEFAULT_DURATION
     dur = max(SEEDANCE_MIN_DURATION, min(SEEDANCE_MAX_DURATION, dur))
 
-    # Auto-classify media files by extension into typed arrays (API v2 format)
+    # Auto-classify media files by extension
     _image_exts = {'.jpg', '.jpeg', '.png', '.webp', '.gif'}
     _video_exts = {'.mp4', '.mov', '.webm', '.avi', '.mkv'}
     _audio_exts = {'.mp3', '.wav', '.m4a', '.aac', '.ogg', '.flac'}
@@ -450,6 +470,10 @@ def create_task(
     _video_files: list[str] = []
     _audio_files: list[str] = []
     for url in (media_files or []):
+        # Asset URIs (Asset://asset-xxx) are always image references
+        if url.startswith("Asset://"):
+            _image_files.append(url)
+            continue
         ext = os.path.splitext(url.split('?')[0])[1].lower()
         if ext in _video_exts:
             _video_files.append(url)
@@ -458,18 +482,16 @@ def create_task(
         else:
             _image_files.append(url)  # default: treat as image
 
-    params: dict = {
-        "prompt": prompt,
-        "ratio": aspect_ratio,
-        "duration": dur,
-        "model": mode,
-    }
-    if _image_files:
-        params["image_files"] = _image_files
-    if _video_files:
-        params["video_files"] = _video_files
-    if _audio_files:
-        params["audio_files"] = _audio_files
+    if SEEDANCE_USE_ARK_API:
+        params = _build_ark_params(
+            prompt, _image_files, _video_files, _audio_files,
+            mode, aspect_ratio, dur,
+        )
+    else:
+        params = _build_legacy_params(
+            prompt, _image_files, _video_files, _audio_files,
+            mode, aspect_ratio, dur,
+        )
 
     payload: dict = {
         "model": SEEDANCE_MODEL_ID,
@@ -477,14 +499,19 @@ def create_task(
         "channel": None,
     }
 
+    # Webhook callback (v2.46): xskill.ai POSTs status changes to this URL
+    if callback_url:
+        payload["callback_url"] = callback_url
+
     if service_tier and service_tier != "default":
         payload["params"]["service_tier"] = service_tier
 
     logger.info("[Seedance] Creating task: prompt=%s...", prompt[:80])
     logger.info(
-        "[Seedance] images=%d videos=%d audio=%d, ratio=%s, duration=%ds, mode=%s, tier=%s",
+        "[Seedance] model=%s, images=%d videos=%d audio=%d, ratio=%s, duration=%s, mode=%s, tier=%s",
+        SEEDANCE_MODEL_ID,
         len(_image_files), len(_video_files), len(_audio_files),
-        aspect_ratio, dur, mode, service_tier,
+        aspect_ratio, params.get("duration", dur), mode, service_tier,
     )
 
     try:
@@ -510,15 +537,141 @@ def create_task(
     return task_id
 
 
+def _build_ark_params(
+    prompt: str,
+    image_files: list[str],
+    video_files: list[str],
+    audio_files: list[str],
+    mode: str,
+    aspect_ratio: str,
+    dur: int,
+) -> dict:
+    """Build params dict for ark/seedance-2.0 API format.
+
+    Key rules for image handling:
+    - ``image_url`` and ``reference_images`` are MUTUALLY EXCLUSIVE
+    - Single image (scene frame only, no character refs) -> ``image_url`` for I2V
+    - Multiple images (scene frame + character refs) -> ALL go into
+      ``reference_images`` array (scene image first, then character sheets)
+    - Character refs only (no scene frame) -> ``reference_images``
+
+    Duration is passed as a string (ark requirement).
+    """
+    params: dict = {
+        "prompt": prompt,
+        "ratio": aspect_ratio,
+        "duration": str(dur),
+        "model": mode,
+        "resolution": SEEDANCE_DEFAULT_RESOLUTION,
+        "generate_audio": SEEDANCE_GENERATE_AUDIO,
+        "watermark": SEEDANCE_WATERMARK,
+    }
+
+    if image_files:
+        # Check if all images are Asset URIs (safe for reference_images mode).
+        # Raw HTTP URLs with real-person faces get rejected in reference_images
+        # but the filter is looser for image_url (first-frame mode).
+        all_assets = all(u.startswith("Asset://") for u in image_files)
+        if len(image_files) == 1:
+            params["image_url"] = image_files[0]
+        elif all_assets:
+            # All Asset URIs — safe to use reference_images for multi-character
+            params["reference_images"] = image_files
+        else:
+            # Mix of HTTP URLs + Asset URIs — use image_url (first frame, looser
+            # filter) for the scene image, skip character sheets to avoid rejection
+            params["image_url"] = image_files[0]
+            logger.info("[Seedance] Using image_url mode (mixed URLs detected, reference_images may trigger real-person filter)")
+
+    if video_files:
+        params["reference_videos"] = video_files
+    if audio_files:
+        params["reference_audios"] = audio_files
+
+    return params
+
+
+def _build_legacy_params(
+    prompt: str,
+    image_files: list[str],
+    video_files: list[str],
+    audio_files: list[str],
+    mode: str,
+    aspect_ratio: str,
+    dur: int,
+) -> dict:
+    """Build params dict for legacy st-ai/super-seed2 API format.
+
+    Uses image_files/video_files/audio_files arrays with
+    functionMode: omni_reference.
+    """
+    params: dict = {
+        "prompt": prompt,
+        "ratio": aspect_ratio,
+        "duration": dur,
+        "model": mode,
+        "functionMode": "omni_reference",
+    }
+
+    if image_files:
+        params["image_files"] = image_files
+    if video_files:
+        params["video_files"] = video_files
+    if audio_files:
+        params["audio_files"] = audio_files
+
+    return params
+
+
+# ============================================================================
+# Failure Recovery Suggestions
+# ============================================================================
+
+
+def _suggest_recovery(error_msg: str, prompt: str) -> str:
+    """Suggest a fix based on the error message and prompt content."""
+    msg = error_msg.lower()
+    suggestions = []
+
+    if "real person" in msg or "content filter" in msg or "2038" in msg:
+        suggestions.append("Upload image to Asset Library first (Asset:// URI bypasses real-person filter)")
+    if "celebrity" in msg or "public figure" in msg:
+        suggestions.append("Remove celebrity references. Describe the character generically instead")
+    if "violence" in msg or "gore" in msg:
+        suggestions.append("Reduce violence level. Use 'action sequence' instead of explicit violence")
+    if "timeout" in msg or "timed out" in msg:
+        suggestions.append("Try shorter duration (5s instead of 15s) or simpler prompt")
+    if "too long" in msg or "token" in msg:
+        suggestions.append("Shorten the prompt — remove redundant descriptions")
+    if "nsfw" in msg or "adult" in msg:
+        suggestions.append("Remove NSFW content. Keep it PG-13 for Seedance")
+
+    if not suggestions:
+        suggestions.append("Try simplifying the prompt or using a different scene description")
+
+    return " | ".join(suggestions)
+
+
 # ============================================================================
 # Task Polling
 # ============================================================================
 
-def poll_task(task_id: str, smart_poll: bool = True) -> dict:
+def poll_task(
+    task_id: str,
+    smart_poll: bool = True,
+    webhook_event: "threading.Event | None" = None,
+) -> dict:
     """Poll a Seedance task until completion.
 
     Uses smart polling by default: initial 30s delay before first poll,
     then 15s intervals instead of 5s.
+
+    Webhook acceleration (v2.46): when ``webhook_event`` is provided,
+    sleeps are replaced with ``event.wait(timeout=interval)``. If a
+    webhook fires, the event is set and the poll loop wakes immediately
+    instead of waiting the full interval. This is purely an accelerator —
+    the authoritative status always comes from the API query, not the
+    webhook payload.
 
     Dead-task detection (v2.45): tracks ``updated_at`` from the API response.
     If the value stays unchanged for ``SEEDANCE_DEAD_TASK_THRESHOLD`` seconds
@@ -528,6 +681,8 @@ def poll_task(task_id: str, smart_poll: bool = True) -> dict:
     Args:
         task_id: Task ID from create_task()
         smart_poll: If True, use initial 30s delay + 15s intervals.
+        webhook_event: Optional threading.Event set by webhook receiver on
+            task status change. Wakes the poll loop early.
 
     Returns:
         Full API response dict on completion
@@ -540,17 +695,30 @@ def poll_task(task_id: str, smart_poll: bool = True) -> dict:
     api_key = get_api_key()
     elapsed = 0
 
+    def _wait(seconds: float) -> None:
+        """Sleep or wait on webhook event. Clears event if triggered."""
+        nonlocal elapsed
+        if webhook_event is not None:
+            triggered = webhook_event.wait(timeout=seconds)
+            if triggered:
+                webhook_event.clear()
+                logger.info("[Seedance] %ds — webhook woke poll loop early", elapsed)
+        else:
+            time.sleep(seconds)
+        elapsed += seconds
+
     if smart_poll:
         initial_delay = SEEDANCE_INITIAL_POLL_DELAY
         poll_interval = SEEDANCE_SMART_POLL_INTERVAL
-        logger.info("[Seedance] Polling task %s (initial wait %ds, then every %ds, max %ds)...",
-                     task_id, initial_delay, poll_interval, SEEDANCE_MAX_POLL_TIME)
-        time.sleep(initial_delay)
-        elapsed += initial_delay
+        webhook_tag = " +webhook" if webhook_event else ""
+        logger.info("[Seedance] Polling task %s (initial wait %ds, then every %ds, max %ds%s)...",
+                     task_id, initial_delay, poll_interval, SEEDANCE_MAX_POLL_TIME, webhook_tag)
+        _wait(initial_delay)
     else:
         poll_interval = SEEDANCE_POLL_INTERVAL
-        logger.info("[Seedance] Polling task %s (every %ds, max %ds)...",
-                     task_id, poll_interval, SEEDANCE_MAX_POLL_TIME)
+        webhook_tag = " +webhook" if webhook_event else ""
+        logger.info("[Seedance] Polling task %s (every %ds, max %ds%s)...",
+                     task_id, poll_interval, SEEDANCE_MAX_POLL_TIME, webhook_tag)
 
     # Dead-task detection state (v2.45)
     last_updated_at: str | None = None
@@ -566,14 +734,12 @@ def poll_task(task_id: str, smart_poll: bool = True) -> dict:
             )
         except requests.RequestException as e:
             logger.warning("[Seedance] Poll network error (%ds): %s", elapsed, e)
-            time.sleep(poll_interval)
-            elapsed += poll_interval
+            _wait(poll_interval)
             continue
 
         if resp.status_code != 200:
             logger.warning("[Seedance] Poll HTTP %d (%ds)", resp.status_code, elapsed)
-            time.sleep(poll_interval)
-            elapsed += poll_interval
+            _wait(poll_interval)
             continue
 
         result = resp.json()
@@ -589,7 +755,9 @@ def poll_task(task_id: str, smart_poll: bool = True) -> dict:
                 data.get("output", {}).get("error", "")
                 or data.get("error", "Unknown error")
             )
-            raise SeedanceError(f"Task failed: {error_msg}")
+            recovery = _suggest_recovery(error_msg, "")
+            logger.warning("[Seedance] Recovery suggestion: %s", recovery)
+            raise SeedanceError(f"Task failed: {error_msg}. Suggestion: {recovery}")
 
         # Dead-task detection (v2.45): check updated_at staleness
         current_updated_at = data.get("updated_at") or data.get("updateTime") or ""
@@ -622,8 +790,7 @@ def poll_task(task_id: str, smart_poll: bool = True) -> dict:
                     f"for {stall_duration:.0f}s (threshold: {SEEDANCE_DEAD_TASK_THRESHOLD}s)"
                 )
 
-        time.sleep(poll_interval)
-        elapsed += poll_interval
+        _wait(poll_interval)
 
     raise SeedanceTimeoutError(f"Seedance task {task_id} timed out after {SEEDANCE_MAX_POLL_TIME}s")
 
@@ -689,21 +856,31 @@ def download_video(video_url: str, output_path: str) -> str:
     logger.info("[Seedance] Downloading video to %s...", output_path)
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
 
+    # Write to a sibling .tmp path first and atomically rename on success.
+    # A crash mid-download leaves only the .tmp, so downstream existsSync
+    # checks on output_path never see a half-written file.
+    tmp_path = f"{output_path}.tmp"
     try:
         resp = requests.get(video_url, stream=True, timeout=120)
         resp.raise_for_status()
 
-        with open(output_path, "wb") as f:
+        with open(tmp_path, "wb") as f:
             for chunk in resp.iter_content(chunk_size=8192):
                 f.write(chunk)
 
     except requests.RequestException as e:
+        if os.path.exists(tmp_path):
+            try:
+                os.remove(tmp_path)
+            except OSError:
+                pass
         raise SeedanceError(f"Download failed: {e}") from e
 
-    file_size = os.path.getsize(output_path)
+    file_size = os.path.getsize(tmp_path)
     if file_size < MIN_VIDEO_SIZE_BYTES:
-        os.remove(output_path)
+        os.remove(tmp_path)
         raise SeedanceError(f"Downloaded video too small ({file_size} bytes), likely corrupt")
 
+    os.replace(tmp_path, output_path)
     logger.info("[Seedance] Downloaded: %s (%.1fMB)", output_path, file_size / 1024 / 1024)
     return output_path

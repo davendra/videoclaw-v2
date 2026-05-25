@@ -42,9 +42,17 @@ class _ColorFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         if self.use_color:
+            # Save and restore levelname to avoid mutation across handlers/propagation.
+            # Mutating record.levelname in-place caused RecursionError when multiple
+            # handlers or propagation to the root logger triggered repeated formatting.
+            original_levelname = record.levelname
             color = _COLORS.get(record.levelname, "")
             reset = _COLORS["RESET"]
-            record.levelname = f"{color}{record.levelname:<7}{reset}"
+            record.levelname = f"{color}{original_levelname:<7}{reset}"
+            try:
+                return super().format(record)
+            finally:
+                record.levelname = original_levelname
         return super().format(record)
 
 
@@ -74,6 +82,10 @@ def setup_logging(
 
     level = logging.DEBUG if verbose else logging.INFO
     logger.setLevel(level)
+
+    # Prevent propagation to root logger — avoids double-formatting and
+    # RecursionError when the root logger has its own handlers.
+    logger.propagate = False
 
     # Console handler with color
     console = logging.StreamHandler(sys.stdout)

@@ -22,7 +22,7 @@ Usage:
 import os
 import subprocess
 
-from config import CONCAT_FILTER_THRESHOLD, FFMPEG_TIMEOUT, FFPROBE_TIMEOUT
+from config import FFMPEG_TIMEOUT, FFPROBE_TIMEOUT
 from exceptions import MissingDependencyError, VideoProcessingError
 
 

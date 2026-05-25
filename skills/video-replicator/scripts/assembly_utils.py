@@ -309,7 +309,7 @@ def normalize_segment(
 
     # Probe source FPS and log if Seedance 60fps detected (v2.45 observability)
     try:
-        from config import SEEDANCE_OUTPUT_FPS, TARGET_ASSEMBLY_FPS
+        from config import SEEDANCE_OUTPUT_FPS
         source_fps = _ff.get_fps(video_path)
         if source_fps and abs(source_fps - SEEDANCE_OUTPUT_FPS) < 1:
             logger.debug(
