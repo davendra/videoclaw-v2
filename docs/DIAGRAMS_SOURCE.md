@@ -77,8 +77,16 @@ flowchart TD
 
 ## 3. Skills ecosystem (`docs/assets/diagram-skills-ecosystem.jpg`)
 
-51 skills as of 2026-05-25, grouped by purpose. The current canonical
+52 skills as of 2026-05-25, grouped by purpose. The current canonical
 source is `skills/catalog.json` — this diagram is illustrative.
+
+> **Note on the rendered JPG:** the current `diagram-skills-ecosystem.jpg`
+> header says "51 total" — off by one from the Mermaid source above.
+> A v3 regeneration was attempted and produced WORSE artifacts
+> (hallucinated headers and misplaced cards), so the v2 render was
+> kept. The footnote in the JPG already directs readers to
+> `skills/catalog.json` as the authoritative count, so the minor header
+> drift is acceptable until the next clean regeneration.
 
 Two canonical entry points (highlighted): **`video-framework`** for
 generic video requests (delegates to specialist children), and

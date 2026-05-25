@@ -1,20 +1,24 @@
 # Deprecation Plan
 
-This document defines the deprecation path from old `videoclaw` workflows to `videoclaw`.
+This document defines the deprecation path from the original `videoclaw` (v0.11.x)
+and the intermediate `vclaw-video-core` rebuild to **`videoclaw-v2`** — the
+merged successor (npm package: `videoclaw`).
 
 ## Goal
 
-Make `videoclaw` the primary execution surface without pretending the legacy repo never existed.
+Make `videoclaw-v2` the primary execution surface without pretending the
+predecessor repos never existed.
 
 ## Current decision
 
 Primary:
 
-1. `videoclaw`
+1. `videoclaw-v2` (npm: `videoclaw`)
 
 Reference/fallback only:
 
-1. `videoclaw`
+1. `videoclaw` v0.11.x (the original repo) — legacy reference / migration source
+2. `vclaw-video-core` — intermediate clean-room rebuild whose foundation was merged into v2
 
 ## Deprecation boundaries
 
@@ -54,17 +58,17 @@ Those conditions are now satisfied.
 
 When a user asks to create or run video work:
 
-1. prefer `videoclaw`
-2. use `videoclaw` only when the missing feature is clearly identified
+1. prefer `videoclaw-v2` (`vclaw` CLI)
+2. fall back to the legacy `videoclaw` v0.11.x runtime only when the missing feature is clearly identified
 3. track every such fallback as a porting task
 
 ## Suggested release language
 
 Use this internal framing:
 
-1. `videoclaw` is now the recommended runtime
+1. `videoclaw-v2` (npm: `videoclaw`) is now the recommended runtime
 2. `omx` remains available only as a temporary CLI alias for `vclaw`
-3. `videoclaw` remains available as a migration/reference source
+3. `videoclaw` v0.11.x and `vclaw-video-core` remain available as migration/reference sources
 4. old workflows should not be expanded further unless they are being ported
 
 ## Sunset rule

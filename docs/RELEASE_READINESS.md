@@ -184,8 +184,8 @@ Most recent smoke evidence from this branch:
    - the same smoke run confirmed that `.omx/video-context.md` exists on the workflow path
 19. latest `HEAD` provider-status and metrics reruns
    - the focused provider/metrics bundle passed again: `cli-providers`, `provider-status`, `cli-metrics`, and `metrics`
-   - a direct provider smoke run again reported `veo-direct`, `veo-useapi`, and `seedance-direct` as available
-   - the same smoke run again reported `runway-useapi` and `kling-useapi` as degraded scaffold routes
+   - a direct provider smoke run again reported `veo-direct`, `veo-useapi`, `seedance-direct`, and `runway-useapi` as available production routes
+   - the same smoke run again reported `kling-useapi` as a degraded scaffold route
    - the same smoke run produced a metrics report with `totalProjects: 1` and the expected `byOpsStatus` breakdown
 20. latest `HEAD` template-bridge and import reruns
    - the focused template/import bundle passed again: `cli-import-legacy`, `cli-storyboard-from-clone`, `cli-templates`, and `template-store`
@@ -555,10 +555,14 @@ Expanded checklist:
 4. run `npm run smoke:character-hydration`
 5. run `npm run smoke:execution-cancel`
 6. run `npm run smoke:portfolio`
-7. run `npm run e2e:image-storyboard`
-8. run `npm run check:omx-alias`
-9. run `npm run check:movie-director-wrappers`
-10. run `npm run check:cleanroom-docs`
-11. from a source checkout, confirm `node dist/cli/vclaw.js video plan --project <slug>` works on a sample workspace; installed-package users should run the same check as `vclaw video plan --project <slug>`
-12. confirm `vclaw video sync-obsidian` still reflects current project state for a sampled workspace
-13. update migration/deprecation notes if alias or lifecycle policy changes
+7. run `npm run smoke:reference-sheets`
+8. run `npm run smoke:scene-candidates`
+9. run `npm run e2e:image-storyboard`
+10. run `npm run check:omx-alias`
+11. run `npm run check:movie-director-wrappers`
+12. run `npm run check:cleanroom-docs`
+13. run `npm run check:skill-frontdoor`
+14. run `npm run check:artifact-schema-coverage`
+15. from a source checkout, confirm `node dist/cli/vclaw.js video plan --project <slug>` works on a sample workspace; installed-package users should run the same check as `vclaw video plan --project <slug>`
+16. confirm `vclaw video sync-obsidian` still reflects current project state for a sampled workspace
+17. update migration/deprecation notes if alias or lifecycle policy changes

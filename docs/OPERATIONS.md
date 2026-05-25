@@ -27,7 +27,9 @@ Publish handoff is canonical only when `review-report.json` has
 11. Run `npm run check:omx-alias` after touching alias/deprecation behavior
 12. Run `npm run check:movie-director-wrappers` after editing bundled Director helper scripts
 13. Run `npm run check:cleanroom-docs` after editing clean-room-facing docs and skills
-14. Use `npm run check:release-readiness-lite` when you want the fast all-in-one local verification bundle, including the isolated image-storyboard E2E
+14. Run `npm run check:skill-frontdoor` after editing repo-local skill `SKILL.md` files
+15. Run `npm run check:artifact-schema-coverage` after editing JSON Schemas under `schemas/video/` or canonical artifact contracts
+16. Use `npm run check:release-readiness-lite` when you want the fast all-in-one local verification bundle, including the isolated image-storyboard E2E
 
 ## Management views
 
@@ -104,9 +106,13 @@ npm run smoke:native-veo
 npm run smoke:character-hydration
 npm run smoke:execution-cancel
 npm run smoke:portfolio
+npm run smoke:reference-sheets
+npm run smoke:scene-candidates
 npm run check:omx-alias
 npm run check:movie-director-wrappers
 npm run check:cleanroom-docs
+npm run check:skill-frontdoor
+npm run check:artifact-schema-coverage
 ```
 
 This validates the documented local happy path and prints the generated machine-readable
