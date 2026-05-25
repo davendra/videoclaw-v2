@@ -206,13 +206,46 @@ The migrator:
 
 ## Artifact schema coverage guardrail
 
-The build pipeline includes `check:artifact-schema-coverage`, which
-asserts:
+The build pipeline includes `check:artifact-schema-coverage`
+(`scripts/check-artifact-schema-coverage.mjs`), which asserts:
 
-1. Every artifact filename written by `src/video/**/*.ts` has a matching
+1. Every artifact name passed to `writeArtifact(workspace, '<name>', ...)`
+   in `src/video/**/*.ts` has a matching
    `schemas/video/artifacts/<name>.schema.json`.
-2. Every schema in `schemas/video/artifacts/` has at least one writer
-   in `src/video/`.
+2. Every schema in `schemas/video/artifacts/` has either a matching
+   `writeArtifact()` call OR is in the script's
+   `KNOWN_ALTERNATE_WRITERS` allowlist (audit-pending; some artifacts
+   are written via specialized helpers rather than the typed
+   `writeArtifact()` shim).
 
-Exits non-zero on drift in either direction. Run as part of
-`check:release-readiness-lite`.
+**Modes:**
+
+- Default (advisory) — prints any drift but always exits 0. This is
+  what `check:release-readiness-lite` invokes, so the guardrail
+  reports status inline without blocking the release-readiness
+  pre-flight while the allowlist is being burned down.
+- `--strict` — exits 1 on drift. Wire into CI gates / pre-commit hooks
+  when you want hard enforcement. Currently zero unexpected drift
+  with the allowlist applied.
+
+Current allowlist (8 schemas needing per-artifact audit): `analyze-output`,
+`clone-plan`, `execution-plan`, `publish-report`, `reference-sheets`,
+`review-report`, `scene-candidates`, `scene-selection`. The audit
+work is tracked in `MERGE_PLAN.md` §A2.
+
+## Slug validation implementation
+
+The slug rules above are enforced by `validateInitSlug()` in
+`src/cli/vclaw.ts`, called from the `init` command before any
+filesystem operation. Test coverage in
+`src/tests/cli-init-slug-validation.test.ts` (6 cases):
+
+1. rejects `--project` as the slug (the historical argv-as-slug bug)
+2. rejects uppercase / whitespace / dots / underscores / leading dots / leading dashes
+3. rejects reserved per-project directory names
+4. rejects consecutive `--`
+5. rejects too-short / too-long
+6. accepts a well-formed slug (`2026-05-25-disco-monster`)
+
+Each failure mode has a distinct error message; the argv-as-slug case
+explicitly names the bug to make the fix discoverable.

@@ -248,11 +248,11 @@ flowchart TD
     Start[["route ∈ { veo-direct · veo-useapi ·<br/>seedance-direct · seedance-useapi ·<br/>runway-useapi · kling-useapi }"]]
     Start --> Q1{"VCLAW_*_ADAPTER set?"}
     Q1 -->|yes| Custom[["Custom adapter binary<br/>stdin → JSON, stdout → JSON"]]
-    Q1 -->|no| Q2{"Built-in adapter supports route?<br/>(veo-direct · seedance-direct)"}
+    Q1 -->|no| Q2{"Built-in adapter supports route?<br/>(seedance-direct · veo-useapi · runway-useapi)"}
     Q2 -->|no| Fail([["❌ hard fail<br/>no silent fallback"]])
     Q2 -->|yes| Q3{"_SUBMIT_CMD / _POLL_CMD set?"}
     Q3 -->|yes| Shim[["Command shim<br/>through built-in adapter"]]
-    Q3 -->|no| Q4{"Native creds available?<br/>SUTUI_API_KEY · local veo-cli"}
+    Q3 -->|no| Q4{"Native creds available?<br/>SUTUI_API_KEY (seedance) · local vclaw-cli (veo) · USEAPI_API_TOKEN (runway)"}
     Q4 -->|yes| Native[["✅ Native in-process transport"]]
     Q4 -->|no| Fail
 ```

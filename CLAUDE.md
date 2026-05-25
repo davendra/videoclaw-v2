@@ -44,6 +44,7 @@ npm run check:omx-alias                  # omx deprecation wrapper
 npm run check:movie-director-wrappers    # bundled Director helper scripts
 npm run check:cleanroom-docs             # clean-room docs + skills
 npm run check:skill-frontdoor            # repo-local skill front door
+npm run check:artifact-schema-coverage   # writers vs schemas drift (advisory; --strict to fail)
 npm run check:release-readiness-lite     # one-shot: build + tests + main smokes + guardrails
 ```
 
