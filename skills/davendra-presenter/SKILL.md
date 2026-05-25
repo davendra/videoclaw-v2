@@ -25,6 +25,10 @@ Create a professional narrated video from a PDF (or pre-animated MP4) slide deck
 
 Full memory file: `~/.claude/projects/-Users-davendrapatel-Documents-GitHub-video-creation-projects/memory/veo-photorealistic-character-filter.md`
 
+### Identity-lock pattern (cross-pollinated from `skills/bunty/SKILL.md`)
+
+If Davendra starts drifting on Pro (clean-shaven young guy, wrong hair, etc. — confirmed common pattern on `character_id=97/Bunty`), copy bunty's helper pattern: write a `davendra_helpers.build_davendra_image_kwargs()` function that prepends a canonical visual-anchor prompt + a negative prompt blocking the observed drift modes, and **always call through the helper** instead of `mcp__go-bananas__generate_image` with just `character_id=109` + a vibe description. See `skills/video-replicator/scripts/bunty_helpers.py` as the reference implementation. Davendra has been stable enough on Pro to not need this yet — but it's the proven fix the moment drift starts.
+
 ---
 
 ## Quick Start
@@ -178,6 +182,28 @@ For the chained intro: scene 17 begins still then speaks; scene 19 starts from s
 **Output**: `projects/{slug}/davendra_scenes.json` (full scene prompts) + `projects/{slug}/dialogue_pair1.json` + `dialogue_pair2.json` (just the spoken lines).
 
 **STOP at GATE 1.** Present the full narration plan + dialogue + word counts and wait for explicit "go".
+
+---
+
+## Phase 2.5: Pre-flight gates (recommended — Bunty pattern)
+
+Two cheap Gemini Vision checks catch issues before paying for TTS / Veo:
+
+```bash
+# Verify each slide's narration actually describes that slide's image.
+# Catches off-by-one beats and slide compression.
+python3 skills/video-replicator/scripts/bunty_narration_check.py \
+  --project "projects/<slug>"
+
+# Predict which slides will trip Veo's image content filter.
+# Saves ~$0.50 per rejected scene at quality tier.
+python3 skills/video-replicator/scripts/bunty_image_filter_check.py \
+  --project "projects/<slug>"
+```
+
+Both gates exit non-zero on issues. Fix the transcript / regenerate problematic slides BEFORE proceeding to Phase 3. Cost: ~$0.01 + 30s for both gates.
+
+The check scripts are presenter-agnostic — they read the slide PNGs + narration JSON from your project root and don't require Bunty-specific config.
 
 ---
 
@@ -742,3 +768,53 @@ Reapit Strategic Briefing v3 (2026-05-13) — Path B + quality Davendra + 16 sli
 - Intro 2 (scene 19): Camera tracks slightly right; continues thoughtful gesture, eyes engaging the camera.
 - Outro 1 (scene 20): Static camera. Reflective leaning back, making a measured point.
 - Outro 2 (scene 21): Holds still, warm sign-off smile, slight nod. Last 2 seconds completely still.
+
+---
+
+## Recovery — when a slide has the wrong fact burned in (Bunty pattern)
+
+If the deck (slide image itself) misattributes a fact — wrong name, wrong number, wrong quote rendered into the slide PNG — the audio narration alone can't fix it because the text is baked into the image. **Fix upstream by re-prompting NotebookLM with an authoritative corrections source**:
+
+```bash
+# 1. Write a corrections file at projects/<slug>/reference/facts_corrected.txt
+#    explicitly stating the correct facts. End with:
+#    "THIS DOCUMENT IS THE AUTHORITATIVE SOURCE."
+
+# 2. Upload as a new source to the existing notebook:
+nlm source add <notebook-id> --wait --wait-timeout 180 \
+  --file projects/<slug>/reference/facts_corrected.txt \
+  --title "CORRECTED facts (authoritative)"
+
+# 3. Regenerate the deck with a focus prompt that cites the corrections
+#    source as the source of truth:
+nlm slides create <notebook-id> --format presenter_slides --length default --confirm \
+  --focus "...your normal focus... CRITICAL ACCURACY: The source titled 'CORRECTED facts (authoritative)' is the source of truth..."
+
+# 4. Once status=completed, download and swap:
+nlm download slide-deck <notebook-id> --format pdf -o projects/<slug>/slides/deck_v2.pdf
+python3 skills/video-replicator/scripts/extract_pdf_slides.py \
+  --pdf projects/<slug>/slides/deck_v2.pdf \
+  --output-dir projects/<slug>/slides_v2 \
+  --output-json projects/<slug>/analysis/slides_v2.json --dpi 200
+
+mv slides slides_v1 && mv slides_v2 slides
+mv analysis/slides.json analysis/slides_v1.json && mv analysis/slides_v2.json analysis/slides.json
+
+# 5. Rewrite narration to match the new beats, regen TTS, regen F2V loops
+#    with --draft-prompts --overwrite-prompts, re-stitch.
+```
+
+Confirmed effective on bunty's Match 6 — the v2 deck used corrected facts and produced a richer narrative. The same pattern applies to any presenter deck where NotebookLM burned the wrong info into a slide image.
+
+---
+
+## Cross-pollination notes (Bunty patterns to consider)
+
+These are battle-tested in `skills/bunty/SKILL.md` and may be useful here:
+
+1. **Env auto-load** — at the top of long pipelines, auto-load `.env.local` so API keys are always present. Avoids "why is my TTS call failing — oh, I forgot to source the env" debugging.
+2. **Failed-artifact skip** — when re-running after a partial failure, skip scenes whose artifacts already exist on disk. Don't re-pay for completed work.
+3. **Interactive preview pages** — for high-cost workflows, write an HTML preview alongside the final MP4 so you can review per-scene assets without scrubbing the video.
+4. **Render-exactly-once guards** — when a model can render a slide twice in different visual styles (e.g. summary slide once as chart, once as photo), add an explicit "RENDER X EXACTLY ONCE — do NOT split / re-render / append a duplicate" instruction to the focus prompt. Cite a real incident as the example to make the point stick.
+
+If you encounter the same problems Bunty hit, these are the proven fixes — port from `skills/video-replicator/scripts/bunty_helpers.py` and friends.
