@@ -47,13 +47,15 @@ src/video/library/
 src/video/narration/
   orchestrator.ts             TTS + bake + reconcile
 src/video/finalize.ts         resolve final path + verification
-scripts/video/
-  auto_create_characters.py   create char via Go Bananas REST
+skills/video-replicator/scripts/
   generate_gobananas.py       image gen (REST + MCP)
   seedance_client.py          create_task / poll_task / extract_video_url
   seedance_assets.py          upload to Asset Library
   seedance_prompt_director.py 3-control-level composer (unused in chained director mode)
   seedance_hooks.py           hook/camera/lighting library
+  bunty_helpers.py            identity-lock kwargs builder pattern (canonical ref)
+
+# Character creation is the `vclaw video character-auto-create` typed CLI surface.
 ```
 
 ## 7 Preflight Checks

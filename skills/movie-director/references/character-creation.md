@@ -59,12 +59,11 @@ cat > /tmp/char_input.json <<'EOF'
 ]
 EOF
 
-python3 scripts/video/auto_create_characters.py \
-  --input /tmp/char_input.json \
-  --output /tmp/char_output.json
+vclaw video character-auto-create \
+  --project <slug> \
+  --input /tmp/char_input.json
 
 # Output JSON contains the new character_id — use it in --gb-character
-cat /tmp/char_output.json
 ```
 
 ## Editing an existing character's description
@@ -84,7 +83,7 @@ vclaw video library clean \
 
 2. **Don't mix style registers.** If the video is Miyazaki watercolor, don't put "photorealistic" in the character description. The character ref image gets generated in the described style; mismatch = weird final frames.
 
-3. **Every character references its art style.** Both the video style (in the description) AND the `style` field passed to `auto_create_characters.py`. Redundant but keeps the reference image aligned.
+3. **Every character references its art style.** Both the video style (in the description) AND the `style` field passed to `vclaw video character-auto-create`. Redundant but keeps the reference image aligned.
 
 4. **Verify the reference image before production.** After creation, look at the Go Bananas library entry. If the auto-generated reference image doesn't look like what you imagined, PATCH the description and regenerate BEFORE burning Seedance on 14 clips that anchor to a wrong ref.
 
