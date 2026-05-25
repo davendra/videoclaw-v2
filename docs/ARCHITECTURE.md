@@ -1,6 +1,52 @@
 # Architecture
 
-`videoclaw` is the clean-room foundation for the next VideoClaw runtime.
+`videoclaw-v2` (npm package: `videoclaw`) is a multi-provider video CLI
+that grew out of two predecessor codebases:
+
+- the original `videoclaw` package (v0.11.x) which had an orchestration
+  layer (ralph / ralplan / team / MCP servers) on top of a video pipeline
+- the clean-room `vclaw-video-core` rebuild which kept only the video
+  pipeline with strict on-disk artifacts + approval gates
+
+v2 takes `vclaw-video-core` as the foundation, drops the orchestration
+layer (Claude Code / Codex now cover those concerns natively), and ports
+forward selected pieces from `videoclaw`: the `vclaw-cli` Bun package
+(formerly `veo-cli`), the Runway transport, a curated Python pipeline,
+and the Google Flow v1 + Omni Flash backend additions.
+
+## What's intentionally NOT here
+
+The following subsystems from the original `videoclaw` v0.11.x are
+deliberately dropped. See `MERGE_PLAN.md` §3 for the rationale:
+
+- `src/team/` (tmux team coordination)
+- `src/ralph/`, `src/ralplan/` (persistent loops + consensus planning)
+- `src/mcp/` (state / memory / code-intel / team / trace MCP servers)
+- `src/hooks/`, `src/autoresearch/`, `src/hud/`, `src/visual/`,
+  `src/openclaw/`, `src/sparkshell/`, `src/runtime/`, `src/subagents/`,
+  `src/notifications/`, `src/verification/`
+- `crates/` (would have been Rust performance components if they had
+  ever been checked in — they were referenced in CLAUDE.md but never
+  existed in source)
+
+Equivalents exist in Claude Code (native subagents), the OMC plugin
+(ralph / team / autopilot skills), and similar host CLI tooling.
+
+## Sidecars
+
+The main repo is pure TypeScript Node 20+, but two opt-in sidecars
+extend it:
+
+- **`vclaw-cli/`** — Bun package (formerly `veo-cli`). Multi-provider
+  video automation: Google Labs Flow (Veo 3.x direct + Omni Flash) via
+  Puppeteer scraping, UseAPI (Veo / Seedance / Runway / Kling), local
+  SQLite job tracking. The main repo's `native-veo.ts` invokes this
+  package for the `veo-direct` transport.
+- **`skills/video-replicator/scripts/`** — Python 3.10+ pipeline. 122
+  modules covering the Seedance Prompt Director (compose / chain /
+  critique / reference-validator / hooks), the bunty cricket pipeline,
+  character sheet generation, presenter helpers, video assembly, and
+  audio utilities. Documented at `docs/PYTHON_PIPELINE.md`.
 
 ## Current layers
 
@@ -16,9 +62,13 @@
    - canonical machine-readable contracts
 6. `src/video/*`
    - portfolio management, reporting, templates, readiness, character consistency, execution planning, adapter-backed execution runtime, and Obsidian export
+   - native in-process transports: `native-veo.ts` (→ `vclaw-cli`/Bun), `native-seedance.ts` (SUTUI_API_KEY), `native-runway.ts` (UseAPI Bearer, pure-Node fetch)
+   - `review-ui.ts` — HTTP server (port 4317) that drives the browser-based storyboard review station at `tmp/review-station/index.html`. See `docs/REVIEW_UI_STORYBOARD_WORKFLOW.md`.
    - `prompt-quality.ts` — six Seedance-handbook anti-pattern checks (adjective soup, multiple actions, multiple camera moves, style-word overload, literary emotion language, overlong prompts) wired into `director-preflight`, warnings by default and promotable to blocking errors via `DIRECTOR_STRICT_PROMPT_QUALITY=1`
    - `dialogue-fit.ts` — short-clip dialogue duration checks wired into `director-preflight`, warnings by default and promotable to blocking errors via `DIRECTOR_STRICT_DIALOGUE_FIT=1`
    - `generation-telemetry.ts` — route/task/config/cost/timing/output telemetry recorded into project event ledgers and used by cost estimates when completed Seedance USD samples exist
+7. `src/video/providers/`
+   - per-provider HTTP adapter code (currently `runway-useapi.ts`). Each adapter exports submit/poll/cancel functions that accept an optional `fetchImpl` for test injection. Wrapped by `src/video/native-*.ts` for production use.
 
 ## Principles
 

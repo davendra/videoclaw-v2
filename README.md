@@ -4,11 +4,13 @@
 
 # videoclaw
 
-**The clean-room, video-first core for VideoClaw.**
+**Multi-provider AI video CLI with explicit stage artifacts, approval gates, and a browser-based Review UI.**
 
 A TypeScript/Node 20 CLI that turns an intent string into a reviewed,
 provider-executed, portfolio-tracked video project — with an explicit,
-machine-readable artifact at every stage.
+machine-readable artifact at every stage. Supports Veo (Google Flow direct
++ UseAPI including Omni Flash), Seedance, and Runway out of the box;
+Kling adapter scaffolded.
 
 [![CI](https://github.com/davendra/videoclaw-v2/actions/workflows/ci.yml/badge.svg?branch=codex/core-visibility-savepoint)](https://github.com/davendra/videoclaw-v2/actions/workflows/ci.yml)
 [![Node](https://img.shields.io/badge/node-20%2B-brightgreen)](./package.json)
@@ -24,15 +26,20 @@ machine-readable artifact at every stage.
 
 ## 💡 Why this exists
 
-VideoClaw's legacy runtime accumulated tangled orchestration, silent provider fallbacks, and implicit state.
-`videoclaw` is the **clean-room re-foundation**: it keeps the useful mental model, replaces the loose-file
-runtime with canonical artifacts, and draws a hard line against behavior that can't be inspected after the fact.
+`videoclaw-v2` (npm: `videoclaw`) is the **merged successor** of two predecessor codebases:
 
-- 🧱 **Clean-room only** — no code inherited from the legacy repo; every module is rewritten against an explicit contract.
+- the older `videoclaw` package (v0.11.x), which had an orchestration layer (ralph / ralplan / team / MCP servers) on top of a video pipeline
+- the clean-room `vclaw-video-core` rebuild, which kept only the video pipeline with strict on-disk artifacts and approval gates
+
+v2 takes `vclaw-video-core` as the foundation, **drops the orchestration layer** (Claude Code, Codex, and the OMC plugin now cover those workflows natively), and **ports forward selected pieces from the original `videoclaw`**: the `vclaw-cli` Bun package (formerly `veo-cli`) for Google Labs Flow + UseAPI, the Runway transport, a curated Python pipeline, and the Google Flow v1 + Omni Flash backend additions.
+
 - 🎥 **Video-first command surface** — one `vclaw video ...` namespace that mirrors the actual production flow.
 - 📄 **Explicit stage artifacts** — every stage writes a JSON artifact you can diff, validate, and replay.
 - 🚫 **No silent fallback** — provider routes fail hard instead of pretending a different route worked.
+- 🖥️ **Browser-based Review UI** — `vclaw video review-ui` boots an HTTP server with a single-page storyboard review station.
 - 🤖 **Agent-ready by design** — machine-readable output, strong docs, and a skills catalog that agents can orient against.
+
+See [`MERGE_PLAN.md`](./MERGE_PLAN.md) for the full merge rationale and per-phase commits, and [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) for the layer map.
 
 ---
 
