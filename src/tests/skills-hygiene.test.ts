@@ -32,6 +32,11 @@ describe('skills hygiene', () => {
       // skills-auditor legitimately mentions the patterns it audits FOR
       // (e.g., '.claude/skills/...') as part of its checklist content.
       if (path.includes('/skills-auditor/')) return false;
+      // skills/video-replicator/scripts/ is the 112-file Python bundle imported
+      // verbatim from the source workspace; it contains code-comment references
+      // to the source layout (e.g. "# .claude/skills/video-replicator/scripts/X.py"
+      // as a file-banner) that are annotations, not functional paths.
+      if (path.includes('/video-replicator/scripts/')) return false;
       return (
         path.endsWith('SKILL.md')
         || path.endsWith('.md')

@@ -22,14 +22,14 @@ import os
 import subprocess
 import sys
 
-# Resolve paths relative to this script's location.
+# Resolve paths relative to THIS script's location
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-SKILL_DIR = os.path.dirname(SCRIPT_DIR)
+SKILL_DIR = os.path.dirname(SCRIPT_DIR)  # skills/nex-presenter/
 ASSETS_DIR = os.path.join(SKILL_DIR, "assets")
 
-# Add video-replicator scripts to path for shared imports.
+# Add video-replicator scripts to path for shared imports
 REPLICATOR_SCRIPTS = os.path.join(
-    os.path.dirname(SKILL_DIR),
+    os.path.dirname(SKILL_DIR),  # skills/
     "video-replicator", "scripts",
 )
 if os.path.isdir(REPLICATOR_SCRIPTS):

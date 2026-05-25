@@ -1,5 +1,5 @@
 {
-  "generatedFrom": "phase-3a-skill-consolidation",
+  "generatedFrom": "phase-4a-canonical-skill-resync",
   "skills": [
     {
       "id": "ai-slop-cleaner",
@@ -214,6 +214,11 @@
       "status": "imported",
       "specializes": "video-framework",
       "role": "specialist"
+    },
+    {
+      "id": "ui-ux-pro-max",
+      "category": "workflow",
+      "status": "imported-from-video-creation-projects"
     },
     {
       "id": "video-analyze-template",
