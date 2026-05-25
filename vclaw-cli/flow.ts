@@ -771,7 +771,7 @@ async function runWithUseApiBackend(
           ? `${new Date().toISOString().slice(0, 10)}_${new Date().toTimeString().slice(0, 5).replace(":", "-")}_${tag || "video"}.mp4`
           : null;
 
-        await completeJob(job.id, videoFileName || "", durationMs, result.estimatedCost || 0);
+        await completeJob(job.id, videoFileName || "", durationMs, result.estimatedCredits || 0);
         progress.markCompleted(job.prompt_index);
 
         // Send webhook notification for job completion

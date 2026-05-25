@@ -135,8 +135,8 @@ export type VideoRequest = T2VRequest | I2VRequest | FramesRequest | Ingredients
 export interface VideoGenerationResult {
   operations: Operation[];
   jobId?: string;                   // useapi.net job ID for tracking
-  estimatedCost?: number;           // Estimated cost in USD
-  actualCost?: number;              // Actual cost after completion
+  estimatedCredits?: number;        // Estimated cost in Flow credits (per Google's credit table)
+  actualCredits?: number;           // Actual cost in Flow credits after completion
 }
 
 /**
@@ -880,9 +880,9 @@ export interface UseApiVideoUpscaleResponse {
  * official credit table); USD equivalent varies by subscription tier.
  */
 export interface CostEstimate {
-  videoGenerationCost: number;      // Video generation cost in credits
-  captchaCost: number;              // CAPTCHA cost in credits (typically 0 — useapi-only concept)
-  totalCost: number;                // Total estimated cost in credits
+  videoGenerationCredits: number;   // Per-video credit cost × videoCount
+  captchaCredits: number;           // CAPTCHA credit cost (typically 0 — Flow credits don't cover captcha)
+  totalCredits: number;             // Total credit cost (videoGeneration + captcha)
   model: string;                    // Model used for estimate
   videoCount: number;               // Number of videos
 }

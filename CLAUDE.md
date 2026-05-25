@@ -125,6 +125,9 @@ For `seedance-direct`, `veo-useapi`, and `runway-useapi`, `vclaw` ships a built-
 - CLI output is machine-readable JSON by default; do not add silent fallbacks across provider routes.
 - Tests use `node:test` with `assert/strict`. Prefer `mkdtemp`/`tmpdir` for temp-directory isolation. Put CLI end-to-end tests under `src/tests/cli-*.test.ts` and module-contract tests under `src/tests/*.test.ts`.
 - When adding a new CLI subcommand: update `src/cli/vclaw.ts`, the relevant `src/video/*` module(s), a schema under `schemas/video/` if it introduces or changes an artifact, add a `cli-*.test.ts`, and update `README.md` + `docs/CLI_REFERENCE.md`. The `check:cleanroom-docs` guardrail watches docs drift.
+- Project slugs are validated by `isProjectSlug` (`src/video/projects.ts`); both `parseProjectSlug` and `handleVideoInit` (`validateInitSlug`) enforce it so flag-looking values (e.g. `--project`) cannot be silently accepted as slugs. Preserve this guard when adding new slug-accepting commands.
+- Architecture diagrams under `docs/assets/*.jpg` are generated from Mermaid sources in `docs/DIAGRAMS_SOURCE.md`. Edit the Mermaid blocks there and regenerate the images via the Go Bananas Pro model — never hand-edit the JPGs.
+- `check:skill-frontdoor` deliberately ignores `skills/seedance-prompts/SKILL.md` and the three presenter skills (`bunty`, `davendra-presenter`, `nex-presenter`) because their docs legitimately reference the legacy Python pipeline scripts. Don't "fix" the ignore list — it's load-bearing.
 - Do not commit secrets, `.env.local`, provider cookies, or `.omx/` state (already gitignored).
 
 ## Autonomy directive (from AGENTS.md)
@@ -133,4 +136,4 @@ Proceed by default on obvious next steps. Keep work scoped to this repository an
 
 ## Recommended reading order
 
-`docs/ARCHITECTURE.md` → `docs/CLI_REFERENCE.md` → `docs/OPERATIONS.md` → `docs/OBSIDIAN.md` → `docs/TEMPLATES.md` → `docs/MIGRATION.md` → `docs/DEPRECATION.md` → `docs/RELEASE_READINESS.md` → `docs/MASTER_PLAN_ALIGNMENT.md`.
+`docs/ARCHITECTURE.md` → `docs/CLI_REFERENCE.md` → `docs/OPERATIONS.md` → `docs/OBSIDIAN.md` → `docs/TEMPLATES.md` → `docs/MIGRATION.md` → `docs/DEPRECATION.md` → `docs/RELEASE_READINESS.md` → `docs/MASTER_PLAN_ALIGNMENT.md` → `docs/DIAGRAMS_SOURCE.md`.

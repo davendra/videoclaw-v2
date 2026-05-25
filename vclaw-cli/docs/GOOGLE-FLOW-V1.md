@@ -239,3 +239,46 @@ Each `media` item: `name`, `mediaGenerationId`, `videoUrl` (signed MP4, ~24h TTL
 | 403 | Captcha rejected | Increase `captchaRetry` (max 10) or supply a pre-solved `captchaToken`. |
 | 503 | Transient or captcha-provider failure | Retry with backoff. |
 | 596 | Session refresh failed | Re-add the Google account in the useapi.net dashboard. |
+
+## Known issues
+
+### Omni Flash V2V edit is being false-positive-rejected at Google's safety filter
+
+**Status:** Known Google bug, no ETA for fix. Tracked at Google internal `b/515000564`.
+
+Calls to `POST /google-flow/videos` with `model:"omni-flash"` + `referenceVideo_1`
+(V2V edit) consistently return:
+
+```
+400 PUBLIC_ERROR_UNSAFE_GENERATION
+mediaStatus.failureReasons: ["FINISH_REASON_INPUT_VIDEO_EDIT"]
+visibility: "FILTERED"
+```
+
+Even on innocuous prompts and procedural (non-AI) source video. This is **not a
+code defect** — the request reaches the `abra_edit` model, the model loads and
+generates a 10s output, and the response is parsed correctly. The block is
+post-generation at Google's content-safety layer. **No credits are charged**
+for filtered outputs.
+
+The same bug affects the Flow web UI and the Gemini app — it is not specific to
+the API. Google VP Josh Woodward acknowledged on X: *"this shouldn't be
+happening."* Community discussion + tracker:
+- [Google AI Developers Forum thread](https://discuss.ai.google.dev/t/omni-video-editing-instantly-rejects-harmless-prompts-in-flow-and-gemini-app/147152)
+- [PiunikaWeb summary (May 20, 2026)](https://piunikaweb.com/2026/05/20/google-investigating-issue-gemini-omni-flash/)
+
+**Action:** Wait for Google to fix the filter; the existing `generateVideo`
+client method requires no changes when V2V starts working again.
+
+### Speech editing is officially restricted (not a bug)
+
+V2V edit calls that also include `referenceAudio_*` may return
+`FINISH_REASON_INPUT_SPEECH_EDIT`. Per the Google DeepMind
+[Gemini Omni Flash model card](https://deepmind.google/models/model-cards/gemini-omni-flash/):
+
+> *Gemini Omni Flash is capable of changing people's speech. For now, we are
+> restricting this capability and working to better understand how to safely
+> and responsibly bring it to our users.*
+
+This is a permanent policy decision until Google relaxes it; no client-side
+workaround.

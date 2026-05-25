@@ -217,8 +217,8 @@ export class UseApiBackend implements VideoBackend {
     const costEstimate = this.estimateCost(request);
 
     if (costEstimate && !this.skipConfirmation) {
-      console.log(`\nEstimated cost: ${costEstimate.totalCost} credits`);
-      console.log(`  ${outputCount} video(s) × ${model} = ${costEstimate.videoGenerationCost} credits`);
+      console.log(`\nEstimated cost: ${costEstimate.totalCredits} credits`);
+      console.log(`  ${outputCount} video(s) × ${model} = ${costEstimate.videoGenerationCredits} credits`);
 
       // Ask for confirmation
       const confirmed = await this.askConfirmation("Proceed? [Y/n] ");
@@ -382,7 +382,7 @@ export class UseApiBackend implements VideoBackend {
     return {
       operations,
       jobId: response.jobId,
-      estimatedCost: costEstimate?.totalCost,
+      estimatedCredits: costEstimate?.totalCredits,
     };
   }
 
@@ -393,9 +393,9 @@ export class UseApiBackend implements VideoBackend {
     const cost = calculateCost(model, videoCount, duration);
 
     return {
-      videoGenerationCost: cost.credits,
-      captchaCost: 0,
-      totalCost: cost.credits,
+      videoGenerationCredits: cost.credits,
+      captchaCredits: 0,
+      totalCredits: cost.credits,
       model,
       videoCount,
     };
