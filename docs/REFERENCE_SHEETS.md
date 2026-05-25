@@ -1,6 +1,6 @@
 # Reference sheets
 
-`vclaw-video-core` treats **reference sheets** as the canonical way to lock the
+`videoclaw` treats **reference sheets** as the canonical way to lock the
 visual grammar of a project — identity, wardrobe, palette, environment, motion —
 into role-tagged, per-scene bindings that the runtime, the approval gate, and
 the ops surfaces all agree on.

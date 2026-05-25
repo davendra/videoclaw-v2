@@ -1,6 +1,6 @@
 # Publishing
 
-How to cut a release of `vclaw-video-core` to npm and propagate it to the
+How to cut a release of `videoclaw` to npm and propagate it to the
 Homebrew tap. Keep this doc aligned with the actual release workflow.
 
 ## Versioning
@@ -67,8 +67,8 @@ authoritative.
 Verify:
 
 ```bash
-npm view vclaw-video-core version
-npx vclaw-video-core@latest video providers
+npm view videoclaw version
+npx videoclaw@latest video providers
 npm pack --dry-run --json
 ```
 
@@ -120,7 +120,7 @@ files under `Formula/`. Recommended: `davendra/homebrew-vclaw`.
 
 ```bash
 gh repo create davendra/homebrew-vclaw --public \
-  --description "Homebrew tap for vclaw-video-core"
+  --description "Homebrew tap for videoclaw"
 git clone https://github.com/davendra/homebrew-vclaw.git
 mkdir -p homebrew-vclaw/Formula
 cp packaging/homebrew/vclaw.rb homebrew-vclaw/Formula/vclaw.rb
@@ -136,7 +136,7 @@ After `npm publish` succeeds:
 
 ```bash
 VERSION=0.2.0
-TARBALL_URL="https://registry.npmjs.org/vclaw-video-core/-/vclaw-video-core-${VERSION}.tgz"
+TARBALL_URL="https://registry.npmjs.org/videoclaw/-/videoclaw-${VERSION}.tgz"
 SHA=$(curl -sL "$TARBALL_URL" | shasum -a 256 | awk '{print $1}')
 
 # In the tap repo, update Formula/vclaw.rb:
@@ -160,7 +160,7 @@ vclaw video providers
 On a fresh machine or clean dir:
 
 ```bash
-npx vclaw-video-core@latest video providers
+npx videoclaw@latest video providers
 # and
 brew tap davendra/vclaw && brew install vclaw && vclaw video providers
 ```
@@ -169,7 +169,7 @@ Both should produce a JSON provider report and exit `0`.
 
 ## Rollback
 
-npm: `npm unpublish vclaw-video-core@<ver>` within 72h, or publish a new patch.
+npm: `npm unpublish videoclaw@<ver>` within 72h, or publish a new patch.
 
 Homebrew tap: revert the formula commit — users will get the prior version on
 their next `brew update && brew upgrade vclaw`.

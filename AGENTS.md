@@ -48,7 +48,7 @@
 <claude-mem-context>
 # Memory Context
 
-# [vclaw-video-core] recent context, 2026-05-18 4:52pm GMT+1
+# [videoclaw] recent context, 2026-05-18 4:52pm GMT+1
 
 Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision 🚨security_alert 🔐security_note
 Format: ID TIME TYPE TITLE
@@ -60,7 +60,7 @@ Stats: 50 obs (21,625t read) | 1,200,363t work | 98% savings
 5963 9:43a 🟣 New Project "davendra-disco-monster" Created with Custom Storyboard
 5992 10:20a 🟣 Human-in-the-Loop HTML Dashboard with Image Display Requested
 5994 10:24a ⚖️ Video Production Technique Research & Documentation Plan
-5995 " 🔵 vclaw-video-core Project Structure: davendra-disco-monster Video Project
+5995 " 🔵 videoclaw Project Structure: davendra-disco-monster Video Project
 6004 12:32p 🔵 Review Station UI Gate Logic and API Surface
 6005 12:33p 🔵 Review Station Action Dispatch, Ledger Schema, and nextAction Decision Tree
 6006 " 🟣 Visual Handoff Strip CSS Components Added to Review Station UI
@@ -74,7 +74,7 @@ Stats: 50 obs (21,625t read) | 1,200,363t work | 98% savings
 6014 12:35p 🟣 Review Station Visual Storyboard Strip Confirmed Working in Live UI
 6015 12:36p ⚖️ Video Storyboard Technique Research and Documentation Initiative
 6016 " 🔵 vclaw Review UI State: 4 Mini-Shots Present, 0 Visual-Handoff Shots
-6017 " 🔵 vclaw-video-core Git State: Modified AGENTS.md and Review Station HTML, New Project Directory
+6017 " 🔵 videoclaw Git State: Modified AGENTS.md and Review Station HTML, New Project Directory
 ### May 8, 2026
 6086 8:12a 🟣 UK AI Contractor Roles Excel Sheet Generation Initiated
 6089 8:13a 🔵 Codex Runtime Environment Paths Confirmed for Spreadsheet Build
@@ -94,11 +94,11 @@ Stats: 50 obs (21,625t read) | 1,200,363t work | 98% savings
 6218 9:20a ✅ 5 AI Job Application Gmail Drafts Trashed After Confirming Sent Status
 6219 " ✅ Fruition Group "Contract AI Engineer" Application Sent — All Today's AI Role Drafts Now Cleared
 6220 " 🔵 Two Notable Unsent Drafts Remain: Alter Domus Reply (Nov 2025) and Wilton Bain IA Manager (Mar 2026)
-6297 10:28a 🔵 vclaw-video-core: Full Repository Assessment (Structure, Capabilities, Live State)
+6297 10:28a 🔵 videoclaw: Full Repository Assessment (Structure, Capabilities, Live State)
 6298 " 🔵 davendra-disco-monster Project: Genre Mismatch and Stale Review Blocking Progress
 6299 " 🔵 publishReady Logic: Both Upscale Asset Completeness AND 5 Assembly Approvals Required
 6300 " 🔵 Portfolio State: 3 Director Projects — 1 Complete, 1 Needs Upscale+Publish, 1 Active Awaiting Publish
-6301 10:29a 🔵 Documented Remaining Gaps in vclaw-video-core vs. Legacy VideoClaw Feature Parity
+6301 10:29a 🔵 Documented Remaining Gaps in videoclaw vs. Legacy VideoClaw Feature Parity
 6307 10:30a 🔵 storyboardReviewState and nextAction Signals Propagate Across All Portfolio Surfaces
 6308 10:31a ⚖️ Production-Readiness Goal Established: Unify Review Truth and Polish UI/UX
 6312 10:32a 🔴 Review Artifact publishReady and nextAction Unified to Single Composite Truth

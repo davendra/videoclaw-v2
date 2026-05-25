@@ -3,8 +3,11 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 > **Repository status (2026-05-25):** This is `videoclaw-v2`, the merged successor of
-> the older `videoclaw` package and the clean-room `vclaw-video-core` rebuild.
-> Phase 0 of the merge has landed (foundation copy from `vclaw-video-core`).
+> the older `videoclaw` package and the clean-room `vclaw-video-core` rebuild. (The
+> npm package is `videoclaw`; "videoclaw-v2" is just the repo name.) Foundation
+> copied from `vclaw-video-core`; presenter skills synced from
+> `video-creation-projects/video-replicator-veo-cli/.claude/skills/`; Runway
+> transport ported from `videoclaw/src/video/providers/runway-useapi.ts`.
 > The full merge plan, decisions, and remaining phases are in `MERGE_PLAN.md` —
 > **read it before starting any non-trivial work.** It is the source of truth for
 > the architecture and what's coming.
@@ -98,7 +101,7 @@ VCLAW_KLING_USEAPI_ADAPTER
 
 Adapters receive JSON on stdin and must return JSON on stdout (`externalJobId` for submit, `pending|completed|failed` for poll).
 
-For `seedance-direct` and `veo-direct`, `vclaw` ships a built-in adapter binary (`dist/cli/provider-adapter.js`) used automatically unless the full `..._ADAPTER` override is set. The built-in adapters read route-specific `..._SUBMIT_CMD` / `..._POLL_CMD` / `..._CANCEL_CMD` command shims, and both routes also have native in-process transports (`native-seedance.ts` uses `SUTUI_API_KEY`; `native-veo.ts` drives a local `veo-cli`).
+For `seedance-direct`, `veo-useapi`, and `runway-useapi`, `vclaw` ships a built-in adapter binary (`dist/cli/provider-adapter.js`) used automatically unless the full `..._ADAPTER` override is set. The built-in adapters read route-specific `..._SUBMIT_CMD` / `..._POLL_CMD` / `..._CANCEL_CMD` command shims. Routes also have native in-process transports: `native-seedance.ts` (uses `SUTUI_API_KEY`), `native-veo.ts` (drives the local `vclaw-cli` Bun package), `native-runway.ts` (pure Node fetch + fs, UseAPI bearer auth). `kling-useapi` remains scaffold-only until an adapter is written.
 
 ### Gemini key pool
 

@@ -1,11 +1,15 @@
 # Migration Guide
 
-This guide is for moving from the old `videoclaw` runtime to the clean-room
-`vclaw-video-core` repo.
+This guide is for moving from either of the predecessor codebases
+(the original `videoclaw` package OR the clean-room `vclaw-video-core`
+rebuild) to **`videoclaw-v2`** — the merged successor that combines
+the best of both. The npm package name remains `videoclaw`; only the
+repository name changed (the v2 suffix is intentional to distinguish
+the merged repo from the older one during the transition).
 
 ## Why migrate
 
-`vclaw-video-core` is now the safer execution surface because it has:
+`videoclaw-v2` (npm: `videoclaw`) is now the safer execution surface because it has:
 
 1. canonical artifacts
 2. explicit stage checkpoints
@@ -25,11 +29,14 @@ The old repo still matters as:
 
 Use the repos like this:
 
-1. `videoclaw`
+1. `videoclaw` (legacy v0.11.x)
    - legacy runtime
    - archive/reference source
    - migration input
-2. `vclaw-video-core`
+2. `vclaw-video-core` (intermediate clean-room rebuild)
+   - intermediate rebuild that became this repo's foundation
+   - now retired in favor of `videoclaw-v2`
+3. `videoclaw-v2` (current — npm package: `videoclaw`)
    - active product surface
    - canonical CLI
    - current execution/runtime lane
@@ -128,15 +135,15 @@ If you have historical folders under the legacy repo, import them into the
 clean repo:
 
 ```bash
-vclaw video import-legacy --source <legacy-videoclaw>/projects --root <vclaw-video-core>
+vclaw video import-legacy --source <legacy-videoclaw>/projects --root <videoclaw>
 ```
 
 Then verify them:
 
 ```bash
-vclaw video doctor-portfolio --root <vclaw-video-core>
-vclaw video metrics --root <vclaw-video-core>
-vclaw video sync-obsidian --root <vclaw-video-core>
+vclaw video doctor-portfolio --root <videoclaw>
+vclaw video metrics --root <videoclaw>
+vclaw video sync-obsidian --root <videoclaw>
 ```
 
 ## Provider migration
@@ -159,7 +166,7 @@ VCLAW_SEEDANCE_BASE_URL=...
 
 Minimum native path:
 
-1. local `veo-cli` workspace
+1. local `vclaw-cli` workspace
 2. `cookie.json`
 3. `bun`
 
@@ -174,7 +181,7 @@ VCLAW_VEO_OUTPUT_DIR=...
 ## Suggested cutover sequence
 
 1. Freeze new feature work in the old runtime lane.
-2. Run `npm test` in `vclaw-video-core`.
+2. Run `npm test` in `videoclaw`.
 3. Validate provider readiness with `vclaw video providers`.
 4. Import historical projects if needed.
 5. Move template and clone workflows first.
@@ -185,7 +192,7 @@ VCLAW_VEO_OUTPUT_DIR=...
 
 If a production job fails in the clean repo for a case the old repo still handles better:
 
-1. keep the artifacts in `vclaw-video-core`
+1. keep the artifacts in `videoclaw`
 2. note the gap explicitly
 3. use the old repo only as a temporary execution fallback
 4. port the missing behavior back into the clean repo

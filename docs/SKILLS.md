@@ -1,6 +1,6 @@
 # Skills
 
-`vclaw-video-core` ships a curated library of **skills** — reusable, agent-invokable workflows that
+`videoclaw` ships a curated library of **skills** — reusable, agent-invokable workflows that
 either produce a video (the *video* category) or orchestrate the work around it (the *workflow* category).
 This doc is the comprehensive per-skill reference. For the machine-readable index see
 [`skills/catalog.json`](../skills/catalog.json); for the full how-to of any individual skill, follow the

@@ -1,6 +1,6 @@
 # Operator Handoff
 
-Use this when handing `vclaw-video-core` to someone who needs to run the video
+Use this when handing `videoclaw` to someone who needs to run the video
 workflow, review work, or understand whether a project is safe to publish.
 
 Installed CLI examples use `vclaw`. In a source checkout, run `npm run build`

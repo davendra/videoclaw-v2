@@ -1,6 +1,6 @@
 # Scene candidates
 
-`vclaw-video-core` treats **scene candidates** as the canonical way to capture
+`videoclaw` treats **scene candidates** as the canonical way to capture
 the output side of video generation — every take the runtime produces for every
 scene, plus the operator's selection state on top of it. This is the
 output-layer counterpart to the input-layer

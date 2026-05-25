@@ -1,16 +1,16 @@
 # Deprecation Plan
 
-This document defines the deprecation path from old `videoclaw` workflows to `vclaw-video-core`.
+This document defines the deprecation path from old `videoclaw` workflows to `videoclaw`.
 
 ## Goal
 
-Make `vclaw-video-core` the primary execution surface without pretending the legacy repo never existed.
+Make `videoclaw` the primary execution surface without pretending the legacy repo never existed.
 
 ## Current decision
 
 Primary:
 
-1. `vclaw-video-core`
+1. `videoclaw`
 
 Reference/fallback only:
 
@@ -54,7 +54,7 @@ Those conditions are now satisfied.
 
 When a user asks to create or run video work:
 
-1. prefer `vclaw-video-core`
+1. prefer `videoclaw`
 2. use `videoclaw` only when the missing feature is clearly identified
 3. track every such fallback as a porting task
 
@@ -62,7 +62,7 @@ When a user asks to create or run video work:
 
 Use this internal framing:
 
-1. `vclaw-video-core` is now the recommended runtime
+1. `videoclaw` is now the recommended runtime
 2. `omx` remains available only as a temporary CLI alias for `vclaw`
 3. `videoclaw` remains available as a migration/reference source
 4. old workflows should not be expanded further unless they are being ported

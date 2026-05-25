@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document captures the current go-live evidence for `vclaw-video-core` and
+This document captures the current go-live evidence for `videoclaw` and
 the remaining non-blocking gaps before it is treated as the default runtime lane.
 
 ## Current evidence

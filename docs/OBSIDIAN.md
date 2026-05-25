@@ -1,6 +1,6 @@
 # Obsidian operator workspace
 
-`vclaw-video-core` ships first-class **Obsidian** support so the operator can run the production
+`videoclaw` ships first-class **Obsidian** support so the operator can run the production
 portfolio from a knowledge-base UI rather than from terminal output. The repo writes a vault of
 machine-generated notes that mirror the canonical project state — dashboards, queues, metrics, health,
 timelines, dependencies, and per-project notes — all regenerated from a single command.

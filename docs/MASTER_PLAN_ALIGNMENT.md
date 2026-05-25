@@ -6,7 +6,7 @@ Source plan:
   in the legacy planning workspace.
 
 This document tracks what parts of the master plan are already implemented in
-`vclaw-video-core`.
+`videoclaw`.
 
 ## Implemented
 
@@ -351,9 +351,9 @@ This document tracks what parts of the master plan are already implemented in
 
 ## Current status
 
-- `npm test` passes in `vclaw-video-core`
+- `npm test` passes in `videoclaw`
 - Current result: all `node:test` cases passing, `0` failing
-- `npm run check:release-readiness-lite` passes in `vclaw-video-core`
+- `npm run check:release-readiness-lite` passes in `videoclaw`
 - The repo is stable and green
 - Character continuity is now enforced before execution planning
 - Adapter-backed live submission now exists in the clean repo

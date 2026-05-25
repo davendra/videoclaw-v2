@@ -458,12 +458,12 @@ VCLAW_SEEDANCE_BASE_URL   # optional, defaults to https://api.xskill.ai
 ```
 
 For `veo-direct`, if `VCLAW_VEO_DIRECT_SUBMIT_CMD` / `VCLAW_VEO_DIRECT_POLL_CMD`
-are unset, the built-in adapter can run the local `veo-cli` workspace using:
+are unset, the built-in adapter can run the local `vclaw-cli` workspace using:
 
 ```bash
-VCLAW_VEO_CLI_ROOT        # optional, defaults to <workspace>/veo-cli
+VCLAW_VEO_CLI_ROOT        # optional, defaults to <workspace>/vclaw-cli
 VCLAW_VEO_BUN_BIN         # optional, defaults to bun
-VCLAW_VEO_OUTPUT_DIR      # optional, defaults to <veo-cli>/output-videos
+VCLAW_VEO_OUTPUT_DIR      # optional, defaults to <vclaw-cli>/output-videos
 ```
 
 ## Execution profile normalization

@@ -1,6 +1,6 @@
 # Architecture
 
-`vclaw-video-core` is the clean-room foundation for the next VideoClaw runtime.
+`videoclaw` is the clean-room foundation for the next VideoClaw runtime.
 
 ## Current layers
 

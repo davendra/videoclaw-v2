@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="./docs/assets/logo.jpg" alt="vclaw-video-core logo" width="180" />
+<img src="./docs/assets/logo.jpg" alt="videoclaw logo" width="180" />
 
-# vclaw-video-core
+# videoclaw
 
 **The clean-room, video-first core for VideoClaw.**
 
@@ -10,7 +10,7 @@ A TypeScript/Node 20 CLI that turns an intent string into a reviewed,
 provider-executed, portfolio-tracked video project — with an explicit,
 machine-readable artifact at every stage.
 
-[![CI](https://github.com/davendra/vclaw-video-core/actions/workflows/ci.yml/badge.svg?branch=codex/core-visibility-savepoint)](https://github.com/davendra/vclaw-video-core/actions/workflows/ci.yml)
+[![CI](https://github.com/davendra/videoclaw-v2/actions/workflows/ci.yml/badge.svg?branch=codex/core-visibility-savepoint)](https://github.com/davendra/videoclaw-v2/actions/workflows/ci.yml)
 [![Node](https://img.shields.io/badge/node-20%2B-brightgreen)](./package.json)
 [![TypeScript](https://img.shields.io/badge/typescript-strict%20%7C%20NodeNext%20ESM-3178c6)](./tsconfig.json)
 [![Status](https://img.shields.io/badge/status-active%20development-orange)](./docs/MASTER_PLAN_ALIGNMENT.md)
@@ -25,7 +25,7 @@ machine-readable artifact at every stage.
 ## 💡 Why this exists
 
 VideoClaw's legacy runtime accumulated tangled orchestration, silent provider fallbacks, and implicit state.
-`vclaw-video-core` is the **clean-room re-foundation**: it keeps the useful mental model, replaces the loose-file
+`videoclaw` is the **clean-room re-foundation**: it keeps the useful mental model, replaces the loose-file
 runtime with canonical artifacts, and draws a hard line against behavior that can't be inspected after the fact.
 
 - 🧱 **Clean-room only** — no code inherited from the legacy repo; every module is rewritten against an explicit contract.
@@ -114,7 +114,7 @@ Handoff checklist: [`docs/OPERATOR_HANDOFF.md`](./docs/OPERATOR_HANDOFF.md).
 
 ## 🏗️ Architecture
 
-<p align="center"><img src="./docs/assets/diagram-architecture.jpg" alt="vclaw-video-core architecture layers — operator/agent at the top, CLI dispatching into domain modules, artifacts/checkpoints/events fanning out, execution runtime feeding the adapter layer, adapter layer branching into native transport, command shim, and custom adapter" width="100%" /></p>
+<p align="center"><img src="./docs/assets/diagram-architecture.jpg" alt="videoclaw architecture layers — operator/agent at the top, CLI dispatching into domain modules, artifacts/checkpoints/events fanning out, execution runtime feeding the adapter layer, adapter layer branching into native transport, command shim, and custom adapter" width="100%" /></p>
 
 <details>
 <summary>Show diagram source (Mermaid)</summary>
@@ -561,4 +561,4 @@ Source-available under a custom proprietary license — see [`LICENSE`](./LICENS
 
 - ✅ **Free** for personal, educational, research, evaluation, and non-commercial internal use
 - 💼 **Commercial / production use requires a paid license** — contact the repository owner via
-  [github.com/davendra/vclaw-video-core](https://github.com/davendra/vclaw-video-core)
+  [github.com/davendra/videoclaw](https://github.com/davendra/videoclaw)

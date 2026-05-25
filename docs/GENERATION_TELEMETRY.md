@@ -1,6 +1,6 @@
 # Generation Telemetry
 
-`vclaw-video-core` records generation telemetry as project events. The goal is
+`videoclaw` records generation telemetry as project events. The goal is
 simple: every provider submission and poll should leave enough machine-readable
 evidence to answer what route ran, how many tasks were sent, what it cost when
 the provider reports cost, how long it took, and how many outputs were ingested.
